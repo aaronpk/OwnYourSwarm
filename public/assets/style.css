@@ -2,6 +2,9 @@
   max-width: 450px;
 }
 
+.hidden {
+  display: none;
+}
 
 body {
   display: flex;
@@ -14,4 +17,12 @@ body {
 }
 .ui.footer.segment {
   flex: 0;
+}
+
+
+.panel {
+  border-radius: 4px;
+  border: 1px #e5e5e5 solid;
+  background: #fafafa;
+  padding: 10px;
 }

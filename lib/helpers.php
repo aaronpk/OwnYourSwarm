@@ -26,14 +26,13 @@ function friendly_url($url) {
   return preg_replace(['/https?:\/\//','/\/$/'],'',$url);
 }
 
-function bs()
-{
-  static $pheanstalk;
-  if(!isset($pheanstalk))
-  {
-    $pheanstalk = new Pheanstalk\Pheanstalk(Config::$beanstalkServer, Config::$beanstalkPort);
+function q() {
+  static $caterpillar = false;
+  if(!$caterpillar) {
+    $logdir = __DIR__.'/../scripts/logs/';
+    $caterpillar = new Caterpillar('ownyourswarm', Config::$beanstalkServer, Config::$beanstalkPort, $logdir);
   }
-  return $pheanstalk;
+  return $caterpillar;
 }
 
 function build_url($parsed_url) {
@@ -64,4 +63,52 @@ function k($a, $k, $default=null) {
     else
       return $default;
   }
+}
+
+function micropub_post($user, $params) {
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $user->micropub_endpoint);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    'Authorization: Bearer ' . $user->micropub_access_token,
+    'Content-Type: application/json'
+  ));
+  curl_setopt($ch, CURLOPT_POST, true);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_HEADER, true);
+  $response = curl_exec($ch);
+
+  $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+  $header_str = trim(substr($response, 0, $header_size));
+
+  $error = curl_error($ch);
+  return [
+    'response' => $response,
+    'code' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
+    'headers' => parse_headers($header_str),
+    'error' => $error,
+    'curlinfo' => curl_getinfo($ch)
+  ];
+}
+
+function parse_headers($headers) {
+  $retVal = array();
+  $fields = explode("\r\n", preg_replace('/\x0D\x0A[\x09\x20]+/', ' ', $headers));
+  foreach($fields as $field) {
+    if(preg_match('/([^:]+): (.+)/m', $field, $match)) {
+      $match[1] = preg_replace_callback('/(?<=^|[\x09\x20\x2D])./', function($m) {
+        return strtoupper($m[0]);
+      }, strtolower(trim($match[1])));
+      // If there's already a value set for the header name being returned, turn it into an array and add the new value
+      $match[1] = preg_replace_callback('/(?<=^|[\x09\x20\x2D])./', function($m) {
+        return strtoupper($m[0]);
+      }, strtolower(trim($match[1])));
+      if(isset($retVal[$match[1]])) {
+        $retVal[$match[1]][] = trim($match[2]);
+      } else {
+        $retVal[$match[1]] = [trim($match[2])];
+      }
+    }
+  }
+  return $retVal;
 }

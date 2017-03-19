@@ -32,6 +32,20 @@ class Foursquare extends Controller {
     return $response;
   }
 
+  public function disconnect(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    $this->user->foursquare_url = '';
+    $this->user->foursquare_user_id = '';
+    $this->user->foursquare_access_token = '';
+    $this->user->save();
+
+    $response->headers->set('Location', '/foursquare');
+    $response->setStatusCode(302);
+    return $response;
+  }
+
   public function callback(Request $request, Response $response) {
     if(!$this->currentUser($response))
       return $response;
@@ -60,6 +74,22 @@ class Foursquare extends Controller {
     if($token && array_key_exists('access_token', $token)) {
 
       $this->user->foursquare_access_token = $token['access_token'];
+
+      // Retrieve user information
+      $ch = curl_init('https://api.foursquare.com/v2/users/self?v=20170319&oauth_token='.$token['access_token']);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      $data = curl_exec($ch);
+      $info = json_decode($data, true);
+      if($info && array_key_exists('response', $info) && array_key_exists('user', $info['response'])) {
+        $this->user->foursquare_user_id = $info['response']['user']['id'];
+        $this->user->foursquare_url = $info['response']['user']['canonicalUrl'];
+
+        // Remove this foursquare user from other accounts
+        ORM::for_table('users')->raw_execute('
+          UPDATE users set foursquare_user_id="", foursquare_url=""
+          WHERE foursquare_user_id=:u', ['u'=>$info['response']['user']['id']]);
+      }
+
       $this->user->save();
 
       $response->headers->set('Location', '/dashboard');
@@ -75,4 +105,39 @@ class Foursquare extends Controller {
     return $response;
   }
 
+  public function push(Request $request, Response $response) {
+    $payload = $request->get('checkin');
+
+    $data = json_decode($payload, true);
+    $user_id = $data['user']['id'];
+
+    $user = ORM::for_table('users')->where('foursquare_user_id', $user_id)->find_one();
+    if($user) {
+      $user->last_checkin_payload = $payload;
+      $user->save();
+
+      $checkin = ORM::for_table('checkins')
+        ->where('user_id', $user->id)
+        ->where('foursquare_checkin_id', $data['id'])
+        ->find_one();
+      if(!$checkin) {
+        $checkin = ORM::for_table('checkins')->create();
+        $checkin->user_id = $user->id;
+        $checkin->foursquare_checkin_id = $data['id'];
+        $checkin->published = date('Y-m-d H:i:s', $data['createdAt']);
+        $checkin->success = 0;
+      }
+      $checkin->foursquare_data = $payload;
+      $checkin->pending = 1;
+      $checkin->save();
+
+      // Delay processing to let the photo process. 
+      // TODO: Remove the delay and add polling to find the photo later.
+      q()->queue('ProcessCheckin', 'run', [$checkin->id], [
+        'delay' => 30 
+      ]);
+    }
+
+    return $response;
+  }
 }

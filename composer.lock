@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e3fe7bcdcdb24686a28689f39a56e1aa",
+    "content-hash": "9ea694ccc891150a623c8439ca831b23",
     "packages": [
         {
             "name": "barnabywalters/mf-cleaner",
@@ -560,6 +560,43 @@
                 "routing"
             ],
             "time": "2016-03-25T23:46:52+00:00"
+        },
+        {
+            "name": "p3k/caterpillar",
+            "version": "0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aaronpk/Caterpillar.git",
+                "reference": "3090a9dcdab2da9a3a21deae2841c9a3f286097f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aaronpk/Caterpillar/zipball/3090a9dcdab2da9a3a21deae2841c9a3f286097f",
+                "reference": "3090a9dcdab2da9a3a21deae2841c9a3f286097f",
+                "shasum": ""
+            },
+            "require": {
+                "pda/pheanstalk": "3.*",
+                "php": ">5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Caterpillar": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache 2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Parecki",
+                    "homepage": "http://aaronparecki.com/"
+                }
+            ],
+            "description": "Caterpillar is a background queue manager",
+            "time": "2017-03-19T19:58:18+00:00"
         },
         {
             "name": "pda/pheanstalk",

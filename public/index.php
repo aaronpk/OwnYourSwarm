@@ -11,7 +11,9 @@ $router = new League\Route\RouteCollection;
 $templates = new League\Plates\Engine(dirname(__FILE__).'/../views');
 
 $router->addRoute('GET', '/', 'Controllers\\Main::index');
+$router->addRoute('GET', '/docs', 'Controllers\\Main::docs');
 $router->addRoute('GET', '/dashboard', 'Controllers\\Main::dashboard');
+$router->addRoute('POST', '/checkin/test.json', 'Controllers\\Main::test_post_checkin');
 
 $router->addRoute('GET', '/auth/signin', 'Controllers\\Auth::signin');
 $router->addRoute('GET', '/auth/start', 'Controllers\\Auth::start');
@@ -20,6 +22,7 @@ $router->addRoute('GET', '/auth/callback', 'Controllers\\Auth::callback');
 
 $router->addRoute('GET', '/foursquare', 'Controllers\\Foursquare::index');
 $router->addRoute('GET', '/foursquare/auth', 'Controllers\\Foursquare::auth');
+$router->addRoute('GET', '/foursquare/disconnect', 'Controllers\\Foursquare::disconnect');
 $router->addRoute('GET', '/foursquare/callback', 'Controllers\\Foursquare::callback');
 $router->addRoute('POST', '/foursquare/push', 'Controllers\\Foursquare::push');
 

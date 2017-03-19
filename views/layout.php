@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="/semantic-ui/semantic.min.css">
     <link rel="stylesheet" href="/assets/style.css">
 
-
+    <script src="/assets/jquery-3.2.0.min.js"></script>
   </head>
 
 <body>
@@ -39,7 +39,6 @@
     </a>
     <?php if(session('me')) { ?>
       <a href="/dashboard" class="item">Dashboard</a>
-      <a href="/checkins" class="item">Checkins</a>
     <?php } ?>
     <a href="/docs" class="item">Docs</a>
     <?php if(session('me')) { ?>
@@ -47,9 +46,7 @@
         <div class="item">
           <a><?= session('me') ?></a>
         </div>
-        <div class="item">
-          <a href="/auth/signout" class="ui button">Sign Out</a>
-        </div>
+        <a href="/auth/signout" class="item">Sign Out</a>
       </div>
     <?php } else if(isset($authorizing)) { ?>
       <div class="right menu">
