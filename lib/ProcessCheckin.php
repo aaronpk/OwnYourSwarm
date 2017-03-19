@@ -21,7 +21,7 @@ class ProcessCheckin {
 
     $micropub_response = micropub_post($user, $entry);
 
-    if($micropub_response['code'] == 201 && isset($micropub_response['headers']['Location'])) {
+    if(in_array($micropub_response['code'],[201,202]) && isset($micropub_response['headers']['Location'])) {
       $canonical_url = $micropub_response['headers']['Location'][0];
     } else {
       $canonical_url = false;
