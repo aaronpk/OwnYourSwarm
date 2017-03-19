@@ -1,0 +1,21 @@
+{
+  "require": {
+    "j4mie/idiorm": "1.5.*",
+    "predis/predis": "1.*",
+    "mf2/mf2": "0.3.*",
+    "indieauth/client": ">=0.2.0",
+    "pda/pheanstalk": "dev-master",
+    "cebe/markdown": "^1.1",
+    "league/plates": "^3.3",
+    "league/route": "1.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Controllers\\": "controllers/"
+    },
+    "files": [
+      "lib/config.php",
+      "lib/helpers.php"
+    ]
+  }
+}
