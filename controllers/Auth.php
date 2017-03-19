@@ -50,7 +50,7 @@ class Auth extends Controller {
       $_SESSION['auth_state'] = $state;
       $_SESSION['auth_me'] = $me;
 
-      $scope = 'create';
+      $scope = 'create update';
       $authorizationURL = IndieAuth\Client::buildAuthorizationURL($authorizationEndpoint, $me, self::buildRedirectURI(), Config::$baseURL, $state, $scope);
     } else {
       $authorizationURL = false;

@@ -25,7 +25,10 @@ class Main extends Controller {
     if(!$this->currentUser($response))
       return $response;
 
-    $hentry = ProcessCheckin::checkinToHEntry(json_decode($this->user->last_checkin_payload, true), $user);
+    if($this->user->last_checkin_payload)
+      $hentry = ProcessCheckin::checkinToHEntry(json_decode($this->user->last_checkin_payload, true), $user);
+    else 
+      $hentry = false;
 
     $response->setContent(view('dashboard', [
       'title' => 'OwnYourSwarm',
