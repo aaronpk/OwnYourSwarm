@@ -1,0 +1,17 @@
+.column {
+  max-width: 450px;
+}
+
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.ui.main.container {
+  margin-top: 80px;
+  flex: 1;
+}
+.ui.footer.segment {
+  flex: 0;
+}

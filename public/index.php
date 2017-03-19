@@ -1,0 +1,42 @@
+<?php
+chdir(dirname(__FILE__).'/..');
+require 'vendor/autoload.php';
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+session_start();
+
+$router = new League\Route\RouteCollection;
+$templates = new League\Plates\Engine(dirname(__FILE__).'/../views');
+
+$router->addRoute('GET', '/', 'Controllers\\Main::index');
+$router->addRoute('GET', '/dashboard', 'Controllers\\Main::dashboard');
+
+$router->addRoute('GET', '/auth/signin', 'Controllers\\Auth::signin');
+$router->addRoute('GET', '/auth/start', 'Controllers\\Auth::start');
+$router->addRoute('GET', '/auth/signout', 'Controllers\\Auth::signout');
+$router->addRoute('GET', '/auth/callback', 'Controllers\\Auth::callback');
+
+$router->addRoute('GET', '/foursquare', 'Controllers\\Foursquare::index');
+$router->addRoute('GET', '/foursquare/auth', 'Controllers\\Foursquare::auth');
+$router->addRoute('GET', '/foursquare/callback', 'Controllers\\Foursquare::callback');
+$router->addRoute('POST', '/foursquare/push', 'Controllers\\Foursquare::push');
+
+$dispatcher = $router->getDispatcher();
+$request = Request::createFromGlobals();
+
+try {
+  $response = $dispatcher->dispatch($request->getMethod(), $request->getPathInfo());
+  $response->send();
+} catch(League\Route\Http\Exception\NotFoundException $e) {
+  $response = new Response;
+  $response->setStatusCode(404);
+  $response->setContent("Not Found\n");
+  $response->send();
+} catch(League\Route\Http\Exception\MethodNotAllowedException $e) {
+  $response = new Response;
+  $response->setStatusCode(405);
+  $response->setContent("Method not allowed\n");
+  $response->send();
+}
