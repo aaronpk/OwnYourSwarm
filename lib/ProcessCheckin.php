@@ -67,11 +67,12 @@ class ProcessCheckin {
             else
               $person_url = 'https://foursquare.com/user/'.$entity['id'];
 
-            $html = substr($html, 0, $entity['indices'][0])
+            $new_html = substr($html, 0, $entity['indices'][0])
               . '<a href="' . $person_url . '">'
-              . substr($html, $entity['indices'][0], $entity['indices'][1])
+              . substr($html, $entity['indices'][0], $entity['indices'][1]-$entity['indices'][0])
               . '</a>'
               . substr($html, $entity['indices'][1]);
+            $html = $new_html;
           }
         }
       }
