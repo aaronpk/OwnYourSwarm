@@ -67,6 +67,27 @@ class ProcessCheckin {
 
     $venue = $checkin['venue'];
 
+    // Include person tags
+    if(isset($checkin['with'])) {
+      $entry['properties']['category'] = [];
+      foreach($checkin['with'] as $with) {
+        // Check our users table to find the person's website if they use OwnYourSwarm
+        $person_urls = ['https://foursquare.com/user/'.$with['id']];
+        $person = ORM::for_table('users')->where('foursquare_user_id', $with['id'])->find_one();
+        if($person) {
+          array_unshift($person_urls, $person->url); // canonical URL is first in the list
+        }
+        $entry['properties']['category'][] = [
+          'type' => ['h-card'],
+          'properties' => [
+            'url' => $person_urls,
+            'name' => [$with['firstName']],
+            'photo' => [$with['photo']['prefix'].'300x300'.$with['photo']['suffix']]
+          ]
+        ];
+      }
+    }
+
     $hcard = [
       'type' => ['h-card'],
       'properties' => [
