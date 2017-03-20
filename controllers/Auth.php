@@ -171,7 +171,7 @@ class Auth extends Controller {
     unset($_SESSION['auth_me']);
 
     // If they have not yet connected a Swarm account, show that prompt now
-    if($user->foursquare_username || $user->micropub_success) {
+    if($user->foursquare_user_id || $user->micropub_success) {
       $response->headers->set('Location', '/dashboard');
     } else {
       $response->headers->set('Location', '/foursquare');
