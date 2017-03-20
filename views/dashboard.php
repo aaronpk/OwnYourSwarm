@@ -34,11 +34,11 @@
     <div style="display: flex; flex-direction: row; margin-top: 1em;">
       <div style="flex: 1 0; border: 1px #e5e5e5 solid; margin: 2px; overflow-x: scroll;">
         <h4>Swarm Checkin Object</h4>
-        <pre style="font-size: 11px;line-height: 13px;"><?= json_encode(json_decode($user->last_checkin_payload), JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES) ?></pre>
+        <pre style="font-size: 11px;line-height: 13px;"><?= htmlspecialchars(json_encode(json_decode($user->last_checkin_payload), JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES)) ?></pre>
       </div>
       <div style="flex: 1 0; border: 1px #e5e5e5 solid; margin: 2px; overflow-x: scroll;">
         <h4>h-entry Checkin Object</h4>
-        <pre style="font-size: 11px;line-height: 13px;"><?= json_encode($hentry_checkin, JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES) ?></pre>
+        <pre style="font-size: 11px;line-height: 13px;"><?= htmlspecialchars(json_encode($hentry_checkin, JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES)) ?></pre>
       </div>
     </div>
 

@@ -54,7 +54,35 @@ class ProcessCheckin {
     ];
 
     if(isset($checkin['shout'])) {
-      $entry['properties']['content'] = [$checkin['shout']];
+      $text = $checkin['shout'];
+      $html = $checkin['shout'];
+
+      if($checkin['entities']) {
+        // Replace from right to left so the offsets aren't messed up
+        foreach(array_reverse($checkin['entities']) as $entity) {
+          if($entity['type'] == 'user') {
+            $person = ORM::for_table('users')->where('foursquare_user_id', $entity['id'])->find_one();
+            if($person)
+              $person_url = $person->url;
+            else
+              $person_url = 'https://foursquare.com/user/'.$entity['id'];
+
+            $html = substr($html, 0, $entity['indices'][0])
+              . '<a href="' . $person_url . '">'
+              . substr($html, $entity['indices'][0], $entity['indices'][1])
+              . '</a>'
+              . substr($html, $entity['indices'][1]);
+          }
+        }
+      }
+
+      if($text == $html) {
+        $entry['properties']['content'] = [$text];
+      } else {
+        $entry['properties']['content'] = [
+          ['value'=>$text, 'html'=>$html]
+        ];
+      }
     }
 
     if(isset($checkin['photos'])) {
