@@ -32,5 +32,11 @@ CREATE TABLE `checkins` (
   `mf2_data` text,
   `success` tinyint(4) NOT NULL DEFAULT '0',
   `pending` tinyint(4) NOT NULL DEFAULT '0',
+  `num_photos` int(11) NOT NULL DEFAULT '0',
+  `num_comments` int(11) NOT NULL DEFAULT '0',
+  `num_likes` int(11) NOT NULL DEFAULT '0',
+  `num_scores` int(11) NOT NULL DEFAULT '0',
+  `date_next_poll` datetime DEFAULT NULL,
+  `poll_interval` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -129,12 +129,12 @@ class Foursquare extends Controller {
       }
       $checkin->foursquare_data = $payload;
       $checkin->pending = 1;
+      $checkin->date_next_poll = date('Y-m-d H:i:s');
+      $checkin->poll_interval = 1;
       $checkin->save();
 
-      // Delay processing to let the photo process. 
-      // TODO: Remove the delay and add polling to find the photo later.
       q()->queue('ProcessCheckin', 'run', [$checkin->id], [
-        'delay' => 30 
+        'delay' => 1
       ]);
     }
 
