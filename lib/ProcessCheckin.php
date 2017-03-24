@@ -31,6 +31,12 @@ class ProcessCheckin {
     return $next;
   }
 
+  public static function scheduleWebmentionJobForCoins(&$checkin) {
+    q()->queue('ProcessCheckin', 'sendCoins', [$checkin->id], [
+      'delay' => 5
+    ]);
+  }
+
   public static function run($checkin_id) {
     $checkin = ORM::for_table('checkins')->find_one($checkin_id);
     if(!$checkin) {
@@ -91,6 +97,8 @@ class ProcessCheckin {
 
       $checkin->save();
 
+      if($canonical_url)
+        self::scheduleWebmentionJobForCoins($checkin);
     } else {
       // Updated checkin (a photo was added)
       $canonical_url = $checkin->canonical_url;
@@ -130,6 +138,8 @@ class ProcessCheckin {
         $checkin->photos = json_encode($photos, JSON_UNESCAPED_SLASHES);
         $checkin->num_photos = $num_photos;
         $checkin->save();
+
+        self::scheduleWebmentionJobForCoins($checkin);
       }
 
     }
@@ -141,6 +151,52 @@ class ProcessCheckin {
         echo "No photo found. Scheduling another check in $next seconds\n";
       } else {
         echo "No photo found. Reached max poll interval, giving up.\n";
+      }
+    }
+  }
+
+  public static function sendCoins($checkin_id) {
+    $checkin = ORM::for_table('checkins')->find_one($checkin_id);
+    if(!$checkin) {
+      echo "Checkin $checkin_id not found\n";
+      return;
+    }
+    $user = ORM::for_table('users')->find_one($checkin->user_id);
+    if(!$user) {
+      echo "User not found\n";
+      return;
+    }
+
+    $data = json_decode($checkin->foursquare_data, true);
+    if(isset($data['score'])) {
+      echo date('Y-m-d H:i:s') . "\n";
+      echo "Sending webmentions for coins\n";
+      echo "User: " . $user->url . "\n";
+      echo "Checkin: " . $checkin->foursquare_checkin_id . "\n";
+      echo "\n";
+
+      foreach($data['score']['scores'] as $score) {
+        $hash = md5(json_encode($score));
+
+        echo "\t+".$score['points']." ".$score['message']."\n";
+
+        $wm = ORM::for_table('webmentions')
+          ->where('foursquare_checkin', $checkin->foursquare_checkin_id)
+          ->where('hash', $hash)
+          ->find_one();
+        if(!$wm) {
+          $wm = ORM::for_table('webmentions')->create();
+          $wm->date_created = date('Y-m-d H:i:s');
+          $wm->checkin_id = $checkin->id;
+          $wm->foursquare_checkin = $checkin->foursquare_checkin_id;
+          $wm->hash = $hash;
+        }
+        $wm->icon = $score['icon'];
+        $wm->coins = $score['points'];
+        $wm->content = $score['message'];
+        $wm->save();
+
+        q()->queue('SendWebmentions', 'send', [$wm->id]);
       }
     }
   }
