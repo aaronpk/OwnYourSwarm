@@ -112,3 +112,7 @@ function parse_headers($headers) {
   }
   return $retVal;
 }
+
+function import_disabled(&$user) {
+  return $user->micropub_failures >= 4;
+}

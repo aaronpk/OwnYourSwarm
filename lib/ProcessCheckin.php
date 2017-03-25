@@ -90,18 +90,21 @@ class ProcessCheckin {
         $checkin->success = 1;
         $checkin->canonical_url = $canonical_url;
         echo "Success! ".$canonical_url."\n";
-
         $this->user->micropub_success = 1;
+        $this->user->micropub_failures = 0;
         $this->user->save();
       } else {
         echo "Micropub post failed\n";
+        $this->user->micropub_failures++;
+        $this->user->save();
       }
       $checkin->pending = 0;
 
       $checkin->save();
 
-      if($canonical_url)
+      if($canonical_url) {
         self::scheduleWebmentionJobForCoins($checkin);
+      }
     } else {
       // Updated checkin (a photo was added)
       $canonical_url = $checkin->canonical_url;

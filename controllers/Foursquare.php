@@ -128,14 +128,21 @@ class Foursquare extends Controller {
         $checkin->success = 0;
       }
       $checkin->foursquare_data = $payload;
-      $checkin->pending = 1;
-      $checkin->date_next_poll = date('Y-m-d H:i:s');
-      $checkin->poll_interval = 1;
+
+      if(!import_disabled($user)) {
+        $checkin->pending = 1;
+        $checkin->date_next_poll = date('Y-m-d H:i:s');
+        $checkin->poll_interval = 1;
+      }
+
       $checkin->save();
 
-      q()->queue('ProcessCheckin', 'run', [$checkin->id], [
-        'delay' => 1
-      ]);
+      // Don't try to process the checkin if they've had more than N micropub requests fail
+      if(!import_disabled($user)) {
+        q()->queue('ProcessCheckin', 'run', [$checkin->id], [
+          'delay' => 1
+        ]);
+      }
     }
 
     return $response;
