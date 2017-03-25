@@ -30,7 +30,7 @@
       <span class="content">
         <?php if($comment->type == 'like'): ?>
           <span><?= $this->e($comment->author_name) ?></span>
-          <span class="e-content p-name"><?= $comment->content ?></span>
+          <span class="e-content p-name">liked your checkin</span>
         <?php elseif($comment->type == 'coin'): ?>
           <span class="e-content p-name"><?= $comment->content ?></span>
         <?php endif ?>
