@@ -1,15 +1,26 @@
 <?php $this->layout('layout', ['title' => $title]); ?>
 
-<div class="ui success message">
-  <p><b>Your account is active!</b></p>
-  <p>
-    Your future checkins will be sent to your site as a Micropub request! 
-    <!-- Review the <a href="/docs">documentation</a> to see an example of what OwnYourSwarm will send. -->
-    Once you check in, you'll see a preview of the Micropub request OwnYourSwarm sends below.
-  </p>
-</div>
+<?php if(import_disabled($user)): ?>
+  <div class="ui error message" id="disabled-message">
+    <p><b>Your account is disabled</b></p>
+    <p>
+      Your Micropub endpoint returned an error too many times in a row.
+      <!-- Review the <a href="/docs">documentation</a> to see an example of what OwnYourSwarm will send. -->
+      If you would like to re-enable sending checkins to your Micropub endpoint, use the "Last Checkin" tool to test your endpoint. If you successfully post a checkin to your enpdoint, importing will be re-enabled.
+    </p>
+  </div>
+<?php else: ?>
+  <div class="ui success message">
+    <p><b>Your account is active!</b></p>
+    <p>
+      Your future checkins will be sent to your site as a Micropub request! 
+      <!-- Review the <a href="/docs">documentation</a> to see an example of what OwnYourSwarm will send. -->
+      Once you check in, you'll see a preview of the Micropub request OwnYourSwarm sends below.
+    </p>
+  </div>
+<?php endif ?>
 
-<h2>Settings</h2>
+<br>
 
 <div class="panel">
   <h3>Foursquare</h3>

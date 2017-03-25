@@ -54,6 +54,7 @@ class Main extends Controller {
 
     if($canonical_url) {
       $this->user->micropub_success = 1;
+      $this->user->micropub_failures = 0;
       $this->user->save();
     }
 
