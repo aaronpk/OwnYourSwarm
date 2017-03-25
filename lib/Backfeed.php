@@ -96,7 +96,7 @@ class Backfeed {
           $wm->checkin_id = $checkin->id;
           $wm->foursquare_checkin = $checkin->foursquare_checkin_id;
           $wm->hash = $hash;
-          $wm->author_photo = $like_data['photo']['prefix'].'original'.$like_data['photo']['suffix'];
+          $wm->author_photo = $like_data['photo']['prefix'].'300x300'.$like_data['photo']['suffix'];
           $wm->author_url = url_for_user($like_data['id']);
           $wm->author_name = $like_data['firstName'].(isset($like_data['lastName']) ? ' '.$like_data['lastName'] : '');
           $wm->save();
@@ -137,7 +137,7 @@ class Backfeed {
         $wm->checkin_id = $checkin->id;
         $wm->foursquare_checkin = $checkin->foursquare_checkin_id;
         $wm->hash = $hash;
-        $wm->author_photo = $comment['user']['photo']['prefix'].'original'.$comment['user']['photo']['suffix'];
+        $wm->author_photo = $comment['user']['photo']['prefix'].'300x300'.$comment['user']['photo']['suffix'];
         $wm->author_url = url_for_user($comment['user']['id']);
         $wm->author_name = $comment['user']['firstName'].(isset($comment['user']['lastName']) ? ' '.$comment['user']['lastName'] : '');
 
