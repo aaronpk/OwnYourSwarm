@@ -146,8 +146,6 @@ class ProcessCheckin {
 
         $checkin->photos = json_encode($photos, JSON_UNESCAPED_SLASHES);
         $checkin->num_photos = $num_photos;
-        $checkin->poll_interval = 0;
-        $checkin->date_next_poll = null;
         $checkin->save();
 
         self::scheduleWebmentionJobForCoins($checkin);
@@ -163,6 +161,10 @@ class ProcessCheckin {
       } else {
         echo "No photo found. Reached max poll interval, giving up.\n";
       }
+    } else {
+      $checkin->poll_interval = 0;
+      $checkin->date_next_poll = null;
+      $checkin->save();
     }
   }
 
