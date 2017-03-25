@@ -3,8 +3,8 @@
 class Backfeed {
 
   public static $tiers = [
-    1,5,10,15,30,60
-    #30,60,120,300,600,1800,3600,86400,86400*2,86400*7,86400*14,86400*30
+    #1,5,10,15,30,60
+    30,60,120,300,600,1800,3600,86400,86400*2,86400*7,86400*14,86400*30
   ];
 
   public static function nextTier($tier) {
@@ -77,7 +77,7 @@ class Backfeed {
       }
     }
 
-#    self::scheduleNext($user);
+    self::scheduleNext($user);
   }
 
   public static function processLikes(&$user, &$checkin, $data) {
