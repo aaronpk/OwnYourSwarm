@@ -52,7 +52,10 @@ class Main extends Controller {
       $canonical_url = false;
     }
 
-
+    if($canonical_url) {
+      $this->user->micropub_success = 1;
+      $this->user->save();
+    }
 
     $response->headers->set('Content-Type', 'application/json');
     $response->setContent(json_encode($info));

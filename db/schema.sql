@@ -10,6 +10,7 @@ CREATE TABLE `users` (
   `micropub_access_token` text,
   `micropub_response` text,
   `micropub_success` tinyint(4) DEFAULT '0',
+  `micropub_update_success` tinyint(4) DEFAULT '0',
   `date_created` datetime DEFAULT NULL,
   `last_login` datetime DEFAULT NULL,
   `last_micropub_response` text,

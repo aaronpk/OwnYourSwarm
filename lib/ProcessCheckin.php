@@ -90,6 +90,9 @@ class ProcessCheckin {
         $checkin->success = 1;
         $checkin->canonical_url = $canonical_url;
         echo "Success! ".$canonical_url."\n";
+
+        $this->user->micropub_success = 1;
+        $this->user->save();
       } else {
         echo "Micropub post failed\n";
       }
@@ -129,6 +132,9 @@ class ProcessCheckin {
           $micropub_response = micropub_post($user, $update);
           if(in_array($micropub_response['code'],[200,201,202,204])) {
             echo "Update of ".$canonical_url." was successful\n";
+
+            $this->user->micropub_update_success = 1;
+            $this->user->save();
           } else {
             echo "Failed to update checkin\n";
             echo $micropub_response['response']."\n";
