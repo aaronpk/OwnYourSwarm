@@ -1,7 +1,7 @@
 CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `url` varchar(255) DEFAULT NULL,
-  `tier` tinyint(4) NOT NULL DEFAULT '3',
+  `poll_interval` int(11) NOT NULL DEFAULT '0',
   `foursquare_user_id` varchar(255) DEFAULT NULL,
   `foursquare_url` varchar(255) DEFAULT NULL,
   `foursquare_access_token` varchar(255) DEFAULT NULL,
@@ -47,10 +47,13 @@ CREATE TABLE `checkins` (
 CREATE TABLE `webmentions` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `date_created` datetime DEFAULT NULL,
+  `type` VARCHAR(255) NOT NULL DEFAULT '',
   `checkin_id` int(11) DEFAULT NULL,
   `foursquare_checkin` varchar(255) DEFAULT NULL,
   `hash` varchar(255) DEFAULT NULL,
-  `icon` varchar(255) DEFAULT NULL,
+  `author_photo` varchar(255) NOT NULL DEFAULT '',
+  `author_url` varchar(255) NOT NULL DEFAULT '',
+  `author_name` varchar(255) NOT NULL DEFAULT '',
   `coins` int(11) DEFAULT NULL,
   `content` text,
   `response_date` datetime DEFAULT NULL,

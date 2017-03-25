@@ -116,3 +116,11 @@ function parse_headers($headers) {
 function import_disabled(&$user) {
   return $user->micropub_failures >= 4;
 }
+
+function url_for_user($fsq_user_id) {
+  $person = ORM::for_table('users')->where('foursquare_user_id', $fsq_user_id)->find_one();
+  if($person)
+    return $person->url;
+  else
+    return 'https://foursquare.com/user/'.$fsq_user_id;
+}

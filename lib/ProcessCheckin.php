@@ -92,6 +92,11 @@ class ProcessCheckin {
         echo "Success! ".$canonical_url."\n";
         $user->micropub_success = 1;
         $user->micropub_failures = 0;
+
+        // Reset backfeed schedule
+        $user->poll_interval = 30;
+        $user->date_next_poll = date('Y-m-d H:i:s', time()+30);
+
         $user->save();
       } else {
         echo "Micropub post failed\n";
@@ -150,7 +155,6 @@ class ProcessCheckin {
 
         self::scheduleWebmentionJobForCoins($checkin);
       }
-
     }
 
     // If there was no photo, queue another polling task to check for the photo later
@@ -203,8 +207,9 @@ class ProcessCheckin {
           $wm->checkin_id = $checkin->id;
           $wm->foursquare_checkin = $checkin->foursquare_checkin_id;
           $wm->hash = $hash;
+          $wm->type = 'coin';
         }
-        $wm->icon = $score['icon'];
+        $wm->author_photo = $score['icon'];
         $wm->coins = $score['points'];
         $wm->content = htmlspecialchars($score['message']);
         $wm->save();
@@ -212,10 +217,6 @@ class ProcessCheckin {
         q()->queue('SendWebmentions', 'send', [$wm->id]);
       }
     }
-  }
-
-  public static function checkinScoreToHEntry($score, $checkin, &$user) {
-
   }
 
   public static function checkinToHEntry($checkin, &$user) {
@@ -239,14 +240,8 @@ class ProcessCheckin {
         // Replace from right to left so the offsets aren't messed up
         foreach(array_reverse($checkin['entities']) as $entity) {
           if($entity['type'] == 'user') {
-            $person = ORM::for_table('users')->where('foursquare_user_id', $entity['id'])->find_one();
-            if($person)
-              $person_url = $person->url;
-            else
-              $person_url = 'https://foursquare.com/user/'.$entity['id'];
-
             $new_html = mb_substr($html, 0, $entity['indices'][0])
-              . '<a href="' . $person_url . '">'
+              . '<a href="' . url_for_user($entity['id']) . '">'
               . mb_substr($html, $entity['indices'][0], $entity['indices'][1]-$entity['indices'][0])
               . '</a>'
               . mb_substr($html, $entity['indices'][1]);

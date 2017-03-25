@@ -15,7 +15,7 @@ $router->addRoute('GET', '/docs', 'Controllers\\Main::docs');
 $router->addRoute('GET', '/dashboard', 'Controllers\\Main::dashboard');
 $router->addRoute('POST', '/checkin/test.json', 'Controllers\\Main::test_post_checkin');
 
-$router->addRoute('GET', '/checkin/{checkin}/{hash}', 'Controllers\\Foursquare::coin');
+$router->addRoute('GET', '/checkin/{checkin}/{hash}', 'Controllers\\Foursquare::comment');
 
 $router->addRoute('GET', '/auth/signin', 'Controllers\\Auth::signin');
 $router->addRoute('GET', '/auth/start', 'Controllers\\Auth::start');

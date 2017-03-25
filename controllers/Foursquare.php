@@ -148,7 +148,7 @@ class Foursquare extends Controller {
     return $response;
   }
 
-  public function coin(Request $request, Response $response, $args) {
+  public function comment(Request $request, Response $response, $args) {
     $webmention = ORM::for_table('webmentions')
       ->where('foursquare_checkin', $args['checkin'])
       ->where('hash', $args['hash'])
@@ -161,10 +161,10 @@ class Foursquare extends Controller {
 
     $checkin = ORM::for_table('checkins')->find_one($webmention->checkin_id);
 
-    $response->setContent(view('foursquare/coin', [
+    $response->setContent(view('foursquare/comment', [
       'title' => 'Swarm Checkin',
       'checkin' => $checkin,
-      'coin' => $webmention
+      'comment' => $webmention
     ]));
     return $response;
   }

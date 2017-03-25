@@ -19,6 +19,7 @@
       "lib/config.php",
       "lib/helpers.php",
       "lib/ProcessCheckin.php",
+      "lib/Backfeed.php",
       "lib/SendWebmentions.php"
     ]
   }
