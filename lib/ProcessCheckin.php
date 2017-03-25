@@ -206,7 +206,7 @@ class ProcessCheckin {
         }
         $wm->icon = $score['icon'];
         $wm->coins = $score['points'];
-        $wm->content = $score['message'];
+        $wm->content = htmlspecialchars($score['message']);
         $wm->save();
 
         q()->queue('SendWebmentions', 'send', [$wm->id]);
