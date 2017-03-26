@@ -44,7 +44,7 @@
   <div class="meta">
     <a href="" class="u-url">
       <time class="dt-published" datetime="<?= $published->format('c') ?>">
-        <?= $published->format('Y-m-d H:i:s P') ?>
+        <?= $published->format('Y-m-d H:i P') ?>
       </time>
     </a>
   </div>
