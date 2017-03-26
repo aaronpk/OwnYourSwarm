@@ -269,9 +269,16 @@ class ProcessCheckin {
 
     $venue = $checkin['venue'];
 
+    // Include hashtags
+    if(preg_match_all('/\B\#(\p{L}+\b)/u', $text, $matches)) {
+      $entry['properties']['category'] = $matches[1];
+    }
+
     // Include person tags
     if(isset($checkin['with'])) {
-      $entry['properties']['category'] = [];
+      if(!isset($entry['properties']['category']))
+        $entry['properties']['category'] = [];
+
       foreach($checkin['with'] as $with) {
         // Check our users table to find the person's website if they use OwnYourSwarm
         $person_urls = ['https://foursquare.com/user/'.$with['id']];
