@@ -221,7 +221,7 @@ class ProcessCheckin {
 
   public static function checkinToHEntry($checkin, &$user) {
     $date = DateTime::createFromFormat('U', $checkin['createdAt']);
-    $tz = new DateTimeZone(sprintf('%+d', $checkin['timeZoneOffset'] / 60));
+    $tz = offset_to_timezone($checkin['timeZoneOffset'] * 60);
     $date->setTimeZone($tz);
 
     $entry = [

@@ -124,3 +124,12 @@ function url_for_user($fsq_user_id) {
   else
     return 'https://foursquare.com/user/'.$fsq_user_id;
 }
+
+function offset_to_timezone($seconds) {
+  if($seconds != 0)
+    $tz = new DateTimeZone(($seconds < 0 ? '-' : '+')
+     . sprintf('%02d:%02d', abs(floor($seconds / 60 / 60)), (($seconds / 60) % 60)));
+  else
+    $tz = new DateTimeZone('UTC');
+  return $tz;
+}
