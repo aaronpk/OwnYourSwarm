@@ -164,7 +164,7 @@ class Foursquare extends Controller {
     $checkin = ORM::for_table('checkins')->find_one($webmention->checkin_id);
 
     $date = new DateTime($webmention->date_created);
-    $date->setTimeZone(new DateTimeZone($checkin->tzoffset/60/60));
+    $date->setTimeZone(new DateTimeZone(sprintf('%+02d',$checkin->tzoffset/60/60)));
 
     $response->setContent(view('foursquare/comment', [
       'title' => 'Swarm Checkin',
