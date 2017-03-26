@@ -144,24 +144,114 @@ Present when available from Swarm:
 <section id="updates">
 <h3><a href="#updates"><span>🔗</span></a> Updates</h3>
 
-<p>Documentation coming soon...</p>
-</section>
+<p>When you add a photo to a checkin on Swarm, occasionally it will be uploaded asynchronously after the checkin itself is created. This means the initial checkin sent to your site will sometimes not include a photo.</p>
 
-<section id="likes-comments">
-<h3><a href="#likes-comments"><span>🔗</span></a> Likes and Comments</h3>
+<p>When this happens, OwnYourSwarm will periodically poll your recent checkins until a photo appears, then send a <a href="https://www.w3.org/TR/micropub/#update">Micropub update request</a> to add it to your post. The polling is based on an exponential back-off schedule. Below is an example request to add a photo.</p>
 
-<p>Documentation coming soon...</p>
+<pre>{
+  "action": "update",
+  "url": "https://example.com/your/checkin/url",
+  "add": {
+    "photo": [
+      "https://igx.4sqi.net/img/general/original/59164_nCV1s2M0arGbdr_Tdx6sAhWD_BKPbyuMx6o-SXvIKWM.jpg"
+    ]
+  }
+}
+</pre>
+
+<p>There may be one or more URLs in the <code>photo</code> property. Once a photo is found, OwnYourSwarm will stop polling the checkin.</p>
+
 </section>
 
 <section id="coins">
 <h3><a href="#coins"><span>🔗</span></a> Coins</h3>
 
-<p>Documentation coming soon...</p>
+<p>The coins that Swarm awards to checkins are sent to your checkins via <a href="https://www.w3.org/TR/webmention/">Webmention</a>. Each description of the coins awarded is given a URL on OwnYourSwarm, and a Webmention is sent from that URL to your checkin URL. OwnYourSwarm waits about 5 seconds after posting your checkin via Micropub before it sends these Webmentions.</p>
+
+<a href="https://ownyourswarm.p3k.io/checkin/58d57db03bd4ab039c76dfed/144ba522fe8454c1e97aef5735329f55"><img src="/images/still-the-mayor.png" width="628"></a>
+
+<p>If your website is already set up to receive comments via Webmention, then you should start seeing these as normal comments automatically. These URLs are marked up with <a href="http://microformats.org/wiki/h-entry">h-entry</a>, including a <a href="https://indieweb.org/in-reply-to">in-reply-to</a> property linking to your original checkin.</p>
+
+<p>The coin pages also have a vendor-specific property in the h-entry, <code>p-swarm-coins</code>, indicating the number of coins Swarm awarded for this item. The only thing you need to worry about beyond handling this as a normal Webmention comment is parsing the <code>p-swarm-coins</code> property if you want to show that.</p>
+
+<p>A complete example of this comment is given below in parsed Microformats 2 JSON format.</p>
+
+<pre>{
+  "type": [
+    "h-entry"
+  ],
+  "properties": {
+    "author": [
+      {
+        "type": [
+          "h-card"
+        ],
+        "properties": {
+          "photo": [
+            "https://ss1.4sqi.net/img/points/coin_icon_crown.png"
+          ],
+          "url": [
+            "https://swarmapp.com/"
+          ],
+          "name": [
+            "Swarm"
+          ]
+        },
+        "value": "https://swarmapp.com/"
+      }
+    ],
+    "name": [
+      "You're still the Mayor. Time to make some rules!"
+    ],
+    "swarm-coins": [
+      "3"
+    ],
+    "in-reply-to": [
+      "https://aaronparecki.com/2017/03/24/7/"
+    ],
+    "url": [
+      "https://ownyourswarm.p3k.io/checkin/58d57db03bd4ab039c76dfed/144ba522fe8454c1e97aef5735329f55"
+    ],
+    "published": [
+      "2017-03-24T13:12:42-07:00"
+    ],
+    "content": [
+      {
+        "html": "You're still the Mayor. Time to make some rules!",
+        "value": "You're still the Mayor. Time to make some rules!"
+      }
+    ]
+  }
+}</pre>
+
+<p>The author of the h-entry will always be Swarm, but the profile photo will change depending on the icon Swarm uses for each line.</p>
+
+<p><a href="https://aaronparecki.com/2017/03/24/9/day-94-ownyourswarm-coins">Read more</a> about coins sent as Webmentions.</p>
+</section>
+
+<section id="likes-comments">
+<h3><a href="#likes-comments"><span>🔗</span></a> Likes and Comments</h3>
+
+<p>When people like and comment on your checkin, OwnYourSwarm will <a href="https://indieweb.org/backfeed">backfeed</a> these responses to your post via Webmention. OwnYourSwarm creates a URL for each like and comment, and sends a Webmention from that URL to your checkin it created.</p>
+
+<a href="https://ownyourswarm.p3k.io/checkin/58d5ba2865e7c71563456f5f/58d6bfdfb12d9f109ae1ab79"><img src="/images/comment.png"></a>
+
+<a href="https://ownyourswarm.p3k.io/checkin/58d5ba2865e7c71563456f5f/fc1fa21b8404b0233e26b3e4f563bd30"><img src="/images/like.png"></a>
+
+<p>These pages are marked up as a traditional <a href="https://indieweb.org/like">like</a> and <a href="https://indieweb.org/comment">comment</a> using <code>h-entry</code> with the appropriate <code>like-of</code> or <code>in-reply-to</code> property. If your website is set up to handle likes and comments already, then these will work without any additional work. If you haven't yet set up the ability to receive likes and comments, then once you can handle these, you will also be able to receive likes and comments from thousands of other IndieWeb sites!</p>
+
+<p>See <a href="https://indieweb.org/Webmention-developer">Webmention developers</a> for details on how to accept and verify webmentions on your website.</p>
+
+<p>OwnYourSwarm will poll your last 100 checkins looking for new likes and comments on your checkins. Whenever you check in, your polling interval is reset to the highest level. Your account will be checked frequently at first, slowly tapering off if there is no new activity. This should keep a balance between catching recent activity on your checkins while not overloading the system.</p>
+
 </section>
 
 </main>
 
 <style type="text/css">
+.docs img {
+  max-width: 100%;
+}
 .ui.fixed.menu {
   position: absolute;
 }
