@@ -326,6 +326,7 @@ class ProcessCheckin {
       'locality' => 'city',
       'region' => 'state',
       'country-name' => 'country',
+      'postal-code' => 'postalCode',
     ];
 
     foreach($props as $k=>$v) {
