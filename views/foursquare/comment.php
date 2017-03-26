@@ -43,8 +43,8 @@
 
   <div class="meta">
     <a href="" class="u-url">
-      <time class="dt-published" datetime="<?= date('c', strtotime($comment->date_created)) ?>">
-        <?= date('Y-m-d H:i:s', strtotime($comment->date_created)) ?>
+      <time class="dt-published" datetime="<?= $published->format('c') ?>">
+        <?= $published->format('Y-m-d H:i:s P') ?>
       </time>
     </a>
   </div>

@@ -4,6 +4,7 @@ namespace Controllers;
 use Config, ORM;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use DateTime, DateTimeZone;
 
 class Foursquare extends Controller {
 
@@ -125,6 +126,7 @@ class Foursquare extends Controller {
         $checkin->user_id = $user->id;
         $checkin->foursquare_checkin_id = $data['id'];
         $checkin->published = date('Y-m-d H:i:s', $data['createdAt']);
+        $checkin->tzoffset = $data['timeZoneOffset'] * 60;
         $checkin->success = 0;
       }
       $checkin->foursquare_data = $payload;
@@ -161,10 +163,14 @@ class Foursquare extends Controller {
 
     $checkin = ORM::for_table('checkins')->find_one($webmention->checkin_id);
 
+    $date = new DateTime($webmention->date_created);
+    $date->setTimeZone(new DateTimeZone($checkin->tzoffset/60/60));
+
     $response->setContent(view('foursquare/comment', [
       'title' => 'Swarm Checkin',
       'checkin' => $checkin,
-      'comment' => $webmention
+      'comment' => $webmention,
+      'published' => $date
     ]));
     return $response;
   }
