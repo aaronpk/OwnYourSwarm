@@ -33,7 +33,7 @@
 
 <div class="ui fixed inverted menu">
   <div class="ui container">
-    <a href="#" class="header item">
+    <a href="/" class="header item">
       <!-- <img class="logo" src="/images/ownyourswarm.png"> -->
       OwnYourSwarm
     </a>

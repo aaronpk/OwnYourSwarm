@@ -16,7 +16,7 @@ Link: &lt;https://indieauth.com/auth&gt;; rel="authorization_endpoint"</code></p
   <?php endif; ?>
 </div>
 
-<div class="ui hidden divider"></div>
+<div class="ui divider"></div>
 
 <div id="token_endpoint" class="ui container">
   <h3>Token Endpoint</h3>
@@ -35,7 +35,7 @@ Link: &lt;https://<?= $meParts['host'] ?>/token&gt;; rel="token_endpoint"</code>
 
 </div>
 
-<div class="ui hidden divider"></div>
+<div class="ui divider"></div>
 
 <div id="micropub_endpoint" class="ui container">
   <h3>Micropub Endpoint</h3>
@@ -54,7 +54,7 @@ Link: &lt;https://<?= $meParts['host'] ?>/micropub&gt;; rel="micropub"</code></p
 
 </div>
 
-<div class="ui hidden divider"></div>
+<div class="ui divider"></div>
 
 <?php if(isset($authorizationURL) && $authorizationURL): ?>
 

@@ -26,3 +26,32 @@ body {
   background: #fafafa;
   padding: 10px;
 }
+
+main.docs section {
+  border: 1px #ddd solid;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 1em;
+}
+
+main.docs pre {
+  background-color: #efefef;
+  border-radius: 4px;
+  padding: 6px;
+}
+
+main.docs h3 a {
+  display: none;
+  text-decoration: none;
+  vertical-align: middle;
+}
+main.docs h3:hover a {
+  margin-left: -24px;
+  padding-right: 2px;
+  line-height: 1;
+  display: inline-block;
+}
+main.docs h3 a span {
+  display: inline-block;
+}
+
