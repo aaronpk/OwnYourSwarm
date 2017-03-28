@@ -232,7 +232,7 @@ class ProcessCheckin {
       ]
     ];
 
-    if(isset($checkin['shout'])) {
+    if(!empty($checkin['shout'])) {
       $text = $checkin['shout'];
       $html = $checkin['shout'];
 
@@ -257,9 +257,14 @@ class ProcessCheckin {
           ['value'=>$text, 'html'=>$html]
         ];
       }
+
+      // Include hashtags
+      if(preg_match_all('/\B\#(\p{L}+\b)/u', $text, $matches)) {
+        $entry['properties']['category'] = $matches[1];
+      }
     }
 
-    if(isset($checkin['photos'])) {
+    if(!empty($checkin['photos']['items'])) {
       $photos = [];
       foreach($checkin['photos']['items'] as $p) {
         $photos[] = $p['prefix'].'original'.$p['suffix'];
@@ -268,11 +273,6 @@ class ProcessCheckin {
     }
 
     $venue = $checkin['venue'];
-
-    // Include hashtags
-    if(preg_match_all('/\B\#(\p{L}+\b)/u', $text, $matches)) {
-      $entry['properties']['category'] = $matches[1];
-    }
 
     // Include person tags
     if(isset($checkin['with'])) {

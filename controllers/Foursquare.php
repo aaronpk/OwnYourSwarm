@@ -164,8 +164,6 @@ class Foursquare extends Controller {
     $checkin = ORM::for_table('checkins')->find_one($webmention->checkin_id);
 
     $date = new DateTime($webmention->date_created);
-    $sign = $checkin->tzoffset < 0 ? '-' : '+';
-    $prefix = $checkin->tzoffset/60/60;
     $date->setTimeZone(offset_to_timezone($checkin->tzoffset));
 
     $response->setContent(view('foursquare/comment', [

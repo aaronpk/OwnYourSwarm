@@ -141,7 +141,7 @@ class Backfeed {
         $wm->author_url = url_for_user($comment['user']['id']);
         $wm->author_name = $comment['user']['firstName'].(isset($comment['user']['lastName']) ? ' '.$comment['user']['lastName'] : '');
 
-        $wm->content = $comment['text'];
+        $wm->content = htmlspecialchars($comment['text']);
         if(isset($comment['sticker'])) {
           $sticker_url = $comment['sticker']['image']['prefix']
             . $comment['sticker']['image']['sizes'][count($comment['sticker']['image']['sizes'])-1]
