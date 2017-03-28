@@ -15,7 +15,7 @@ class Backfeed {
       return false;
   }
 
-  public static function scheduleNext(&$user) {
+  private static function scheduleNext(&$user) {
     $next = self::nextTier($user->poll_interval);
     if($next) {
       $user->poll_interval = $next;
@@ -54,30 +54,67 @@ class Backfeed {
     }
 
     foreach($info['response']['checkins']['items'] as $checkin_data) {
-      $checkin = ORM::for_table('checkins')
-        ->where('user_id', $user->id)
-        ->where('foursquare_checkin_id', $checkin_data['id'])
-        ->find_one();
-      if($checkin) {
-        $cur_num_likes = $checkin_data['likes']['count'];
-        $cur_num_comments = $checkin_data['comments']['count'];
-
-        if($cur_num_likes != $checkin->num_likes) {
-          self::processLikes($user, $checkin, $checkin_data);
-        }
-        if($cur_num_comments != $checkin->num_comments) {
-          self::processComments($user, $checkin, $checkin_data);
-        }
-
-        $checkin->num_likes = $cur_num_likes;
-        $checkin->num_comments = $cur_num_comments;
-        $checkin->save();
-      } else {
-        #echo "Checkin not found in database: ".$checkin_data['id']."\n";
-      }
+      self::processBackfeedForSwarmCheckin($user, $checkin_data);
     }
 
     self::scheduleNext($user);
+  }
+
+  public static function runForCheckin($checkin_id) {
+    $checkin = ORM::for_table('checkins')->find_one($checkin_id);
+    if(!$checkin) {
+      echo "Checkin not found: $checkin_id\n";
+      return;
+    }
+
+    $user = ORM::for_table('users')->find_one($checkin->user_id);
+    if(!$user) {
+      echo "User not found\n";
+      return;
+    }
+
+    echo "=============================================\n";
+    echo date('Y-m-d H:i:s') . "\n";
+    echo "User: " . $user->url . "\n";
+    echo "Checkin: " . $checkin->foursquare_checkin_id . "\n";
+    echo $checkin->canonical_url . "\n";
+
+    $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin->foursquare_checkin_id.'?v=20170319&oauth_token='.$user->foursquare_access_token);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $info = json_decode(curl_exec($ch), true);
+
+    if(!isset($info['response']['checkin'])) {
+      echo "Foursquare API returned invalid data for checkin: ".$checkin->foursquare_checkin_id."\n";
+      print_r($info);
+      echo "\n";
+      return;
+    }
+
+    self::processBackfeedForSwarmCheckin($user, $info['response']['checkin']);
+  }
+
+  private static function processBackfeedForSwarmCheckin($user, $checkin_data) {
+    $checkin = ORM::for_table('checkins')
+      ->where('user_id', $user->id)
+      ->where('foursquare_checkin_id', $checkin_data['id'])
+      ->find_one();
+    if($checkin) {
+      $cur_num_likes = $checkin_data['likes']['count'];
+      $cur_num_comments = $checkin_data['comments']['count'];
+
+      if($cur_num_likes != $checkin->num_likes) {
+        self::processLikes($user, $checkin, $checkin_data);
+      }
+      if($cur_num_comments != $checkin->num_comments) {
+        self::processComments($user, $checkin, $checkin_data);
+      }
+
+      $checkin->num_likes = $cur_num_likes;
+      $checkin->num_comments = $cur_num_comments;
+      $checkin->save();
+    } else {
+      echo "Checkin not found in database: ".$checkin_data['id']."\n";
+    }
   }
 
   public static function processLikes(&$user, &$checkin, $data) {
@@ -91,7 +128,7 @@ class Backfeed {
           ->find_one();
         if(!$wm) {
           $wm = ORM::for_table('webmentions')->create();
-          $wm->date_created = date('Y-m-d H:i:s');
+          $wm->date_created = $checkin->published;
           $wm->type = 'like';
           $wm->checkin_id = $checkin->id;
           $wm->foursquare_checkin = $checkin->foursquare_checkin_id;

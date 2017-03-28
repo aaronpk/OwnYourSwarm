@@ -33,6 +33,24 @@
 <br>
 
 <div class="panel">
+  <h3>Import Past Checkin</h3>
+
+  <p>Note: This feature is in super beta! There is currently no feedback once you click a button.</p>
+  <p>Enter one of your checkin IDs, and that checkin will be re-processed. If the checkin has already been sent to your site, it will not be sent again. If you want to re-send a checkin that has already been sent once, you can click the "Reset" button to delete any trace of a specific checkin from OwnYourSwarm.</p>
+
+  <form>
+    <div class="ui input">
+      <input type="text" id="import_checkin_id" placeholder="checkin ID">
+    </div>
+    <a class="ui small green button" id="import-checkin" href="">Import</a>
+    <a class="ui small red button" id="reset-checkin" href="">Reset</a>
+  </form>
+
+</div>
+
+<br>
+
+<div class="panel">
   <h3>Last Checkin</h3>
 
   <? if($user->last_checkin_payload): ?>
@@ -67,6 +85,26 @@ $(function(){
     $.post("/checkin/test.json", function(response){
       $("#post-checkin").removeClass("loading");
       $("#micropub-response").removeClass("hidden").text(response.response);
+    });
+    return false;
+  });
+
+  $("#import-checkin").click(function(){
+    $("#import-checkin").addClass("loading");
+    $.post("/checkin/import.json", {
+      checkin: $("#import_checkin_id").val()
+    }, function(response){
+      $("#import-checkin").removeClass("loading");
+    });
+    return false;
+  });
+
+  $("#reset-checkin").click(function(){
+    $("#reset-checkin").addClass("loading");
+    $.post("/checkin/reset.json", {
+      checkin: $("#import_checkin_id").val()
+    }, function(response){
+      $("#reset-checkin").removeClass("loading");
     });
     return false;
   });

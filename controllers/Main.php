@@ -4,6 +4,7 @@ namespace Controllers;
 use ProcessCheckin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use ORM;
 
 class Main extends Controller {
 
@@ -60,6 +61,44 @@ class Main extends Controller {
 
     $response->headers->set('Content-Type', 'application/json');
     $response->setContent(json_encode($info));
+    return $response;
+  }
+
+  public function import_checkin(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    if(!$request->get('checkin'))
+      return $response;
+
+    q()->queue('ProcessCheckin', 'run', [$this->user->id, $request->get('checkin'), true]);
+
+    $response->headers->set('Content-Type', 'application/json');
+    $response->setContent(json_encode(['result'=>'queued']));
+    return $response;
+  }
+
+  public function reset_checkin(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    if(!$request->get('checkin'))
+      return $response;
+
+    $checkin = ORM::for_table('checkins')
+      ->where('user_id', $this->user->id)
+      ->where('foursquare_checkin_id', $request->get('checkin'))
+      ->find_one();
+
+    if($checkin) {
+      ORM::for_table('webmentions')
+        ->where('checkin_id', $checkin->id)
+        ->delete_many();
+      $checkin->delete();
+    }
+
+    $response->headers->set('Content-Type', 'application/json');
+    $response->setContent(json_encode(['result'=>'deleted']));
     return $response;
   }
 

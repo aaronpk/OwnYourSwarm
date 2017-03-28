@@ -5,11 +5,16 @@ class SendWebmentions {
   public static function send($id) {
     $webmention = ORM::for_table('webmentions')->find_one($id);
     if(!$webmention) {
-      echo "Not found: $id\n";
+      echo "Webmention not found: $id\n";
       return;
     }
 
     $checkin = ORM::for_table('checkins')->find_one($webmention->checkin_id);
+
+    if(!$checkin) {
+      echo "Checkin not found: $webmention->checkin_id\n";
+      return;
+    }
 
     $source_url = Config::$baseURL . '/checkin/' . $webmention->foursquare_checkin . '/' . $webmention->hash;
 

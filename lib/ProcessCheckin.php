@@ -15,10 +15,10 @@ class ProcessCheckin {
       return false;
   }
 
-  public static function scheduleNext(&$checkin) {
+  private static function scheduleNext(&$checkin) {
     $next = self::nextTier($checkin->poll_interval);
     if($next) {
-      q()->queue('ProcessCheckin', 'run', [$checkin->id], [
+      q()->queue('ProcessCheckin', 'run', [$checkin->user_id, $checkin->foursquare_checkin_id], [
         'delay' => $next
       ]);
       $checkin->poll_interval = $next;
@@ -37,13 +37,8 @@ class ProcessCheckin {
     ]);
   }
 
-  public static function run($checkin_id) {
-    $checkin = ORM::for_table('checkins')->find_one($checkin_id);
-    if(!$checkin) {
-      echo "Checkin $checkin_id not found\n";
-      return;
-    }
-    $user = ORM::for_table('users')->find_one($checkin->user_id);
+  public static function run($user_id, $checkin_id, $is_import=false) {
+    $user = ORM::for_table('users')->find_one($user_id);
     if(!$user) {
       echo "User not found\n";
       return;
@@ -51,16 +46,33 @@ class ProcessCheckin {
 
     echo date('Y-m-d H:i:s') . "\n";
     echo "User: " . $user->url . "\n";
-    echo "Checkin: " . $checkin->foursquare_checkin_id . "\n";
+    echo "Checkin: " . $checkin_id . "\n";
 
-    $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin->foursquare_checkin_id.'?v=20170319&oauth_token='.$user->foursquare_access_token);
+    $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin_id.'?v=20170319&oauth_token='.$user->foursquare_access_token);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $info = json_decode(curl_exec($ch), true);
 
     if(!isset($info['response']['checkin'])) {
-      echo "Checkin not found: ".$checkin->foursquare_checkin_id."\n";
+      echo "Foursquare API returned invalid data for checkin: ".$checkin_id."\n";
+      print_r($info);
+      echo "\n";
       return;
     }
+
+    $checkin = ORM::for_table('checkins')
+      ->where('user_id', $user->id)
+      ->where('foursquare_checkin_id', $checkin_id)
+      ->find_one();
+    if(!$checkin) {
+      $checkin = ORM::for_table('checkins')->create();
+      $checkin->user_id = $user->id;
+      $checkin->foursquare_checkin_id = $checkin_id;
+      $checkin->published = date('Y-m-d H:i:s', $info['response']['checkin']['createdAt']);
+      $checkin->tzoffset = $info['response']['checkin']['timeZoneOffset'] * 60;
+      $checkin->success = 0;
+    }
+    $checkin->foursquare_data = json_encode($info['response']['checkin'], JSON_UNESCAPED_SLASHES);
+    $checkin->save();
 
     // New checkin
     if(!$checkin->canonical_url) {
@@ -74,7 +86,6 @@ class ProcessCheckin {
 
       echo "Checkin has $num_photos photos\n";
 
-      $checkin->foursquare_data = json_encode($info['response']['checkin'], JSON_UNESCAPED_SLASHES);
       $checkin->mf2_data = json_encode($entry, JSON_UNESCAPED_SLASHES);
       $checkin->save();
 
@@ -115,6 +126,8 @@ class ProcessCheckin {
       $canonical_url = $checkin->canonical_url;
 
       $existing_photos = json_decode($checkin->photos, true);
+      if(!$existing_photos)
+        $existing_photos = [];
 
       $data = $info['response']['checkin'];
 
@@ -153,12 +166,14 @@ class ProcessCheckin {
         $checkin->num_photos = $num_photos;
         $checkin->save();
 
-        self::scheduleWebmentionJobForCoins($checkin);
+        if(count($new_photos)) {
+          self::scheduleWebmentionJobForCoins($checkin);
+        }
       }
     }
 
     // If there was no photo, queue another polling task to check for the photo later
-    if($canonical_url && $num_photos == 0) {
+    if(!$is_import && $canonical_url && $num_photos == 0) {
       $next = self::scheduleNext($checkin);
       if($next) {
         echo "No photo found. Scheduling another check in $next seconds\n";
@@ -169,6 +184,12 @@ class ProcessCheckin {
       $checkin->poll_interval = 0;
       $checkin->date_next_poll = null;
       $checkin->save();
+    }
+
+    if($is_import && $canonical_url) {
+      q()->queue('Backfeed', 'runForCheckin', [$checkin->id], [
+        'delay' => 2
+      ]);
     }
   }
 
@@ -185,7 +206,7 @@ class ProcessCheckin {
     }
 
     $data = json_decode($checkin->foursquare_data, true);
-    if(isset($data['score'])) {
+    if(!empty($data['score']) && !empty($data['score']['scores'])) {
       echo date('Y-m-d H:i:s') . "\n";
       echo "Sending webmentions for coins\n";
       echo "User: " . $user->url . "\n";
@@ -203,7 +224,7 @@ class ProcessCheckin {
           ->find_one();
         if(!$wm) {
           $wm = ORM::for_table('webmentions')->create();
-          $wm->date_created = date('Y-m-d H:i:s');
+          $wm->date_created = $checkin->published;
           $wm->checkin_id = $checkin->id;
           $wm->foursquare_checkin = $checkin->foursquare_checkin_id;
           $wm->hash = $hash;

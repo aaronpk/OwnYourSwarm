@@ -14,8 +14,13 @@ $router->addRoute('GET', '/', 'Controllers\\Main::index');
 $router->addRoute('GET', '/docs', 'Controllers\\Main::docs');
 $router->addRoute('GET', '/dashboard', 'Controllers\\Main::dashboard');
 $router->addRoute('POST', '/checkin/test.json', 'Controllers\\Main::test_post_checkin');
+$router->addRoute('POST', '/checkin/import.json', 'Controllers\\Main::import_checkin');
+$router->addRoute('POST', '/checkin/reset.json', 'Controllers\\Main::reset_checkin');
 
 $router->addRoute('GET', '/checkin/{checkin}/{hash}', 'Controllers\\Foursquare::comment');
+
+$router->addRoute('GET', '/user/{userid}/checkin/{checkin}/{type}/{hash}', 'Controllers\\FoursquarePermalink::response');
+$router->addRoute('GET', '/user/{userid}/checkin/{checkin}', 'Controllers\\FoursquarePermalink::checkin');
 
 $router->addRoute('GET', '/auth/signin', 'Controllers\\Auth::signin');
 $router->addRoute('GET', '/auth/start', 'Controllers\\Auth::start');
