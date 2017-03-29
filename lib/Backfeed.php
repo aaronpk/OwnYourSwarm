@@ -113,7 +113,7 @@ class Backfeed {
       $checkin->num_comments = $cur_num_comments;
       $checkin->save();
     } else {
-      echo "Checkin not found in database: ".$checkin_data['id']."\n";
+      #echo "Checkin not found in database: ".$checkin_data['id']."\n";
     }
   }
 
