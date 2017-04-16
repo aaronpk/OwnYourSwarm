@@ -142,7 +142,7 @@ class Foursquare extends Controller {
       // Don't try to process the checkin if they've had more than N micropub requests fail
       if(!import_disabled($user)) {
         q()->queue('ProcessCheckin', 'run', [$checkin->user_id, $checkin->foursquare_checkin_id], [
-          'delay' => 1
+          'delay' => 15
         ]);
       }
     }
