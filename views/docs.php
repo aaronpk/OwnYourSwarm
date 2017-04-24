@@ -55,7 +55,7 @@ Authorization: Bearer xxxxxxxxxxxxxxxxxxxxxxx</code></pre>
 
 <h4>syndication</h4>
 
-<p>The <code>syndication</code> property will contain the Swarm permalink to the checkin. Note that Swarm permalinks are only visible to the user who created the checkin.</p>
+<p>The <code>syndication</code> property will contain the Swarm permalink to the checkin. Note that the Swarm permalinks sent in this parameter are not publicly visible, they only visible to your Swarm friends.</p>
 
 <h4>photo</h4>
 
