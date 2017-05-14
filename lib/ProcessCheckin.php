@@ -400,7 +400,7 @@ class ProcessCheckin {
         if($prettyprint == false) {
           // Download photos to temp file and add to the request
           $finfo = finfo_open(FILEINFO_MIME_TYPE);
-          $prop = count($params['properties']) > 1 ? 'photo[]' : 'photo';
+          $prop = count($params['properties']['photo']) > 1 ? 'photo[]' : 'photo';
           foreach($params['properties']['photo'] as $photo) {
             $file_path = tempnam(sys_get_temp_dir(), 'fsq');
             file_put_contents($file_path, file_get_contents($photo));
