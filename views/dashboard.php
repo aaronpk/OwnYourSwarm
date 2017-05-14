@@ -72,7 +72,7 @@
 <div class="panel">
   <h3>Last Checkin</h3>
 
-  <? if($user->last_checkin_payload): ?>
+  <div id="last-checkin-preview" class="<?= $user->last_checkin_payload ? '' : 'hidden' ?>">
     <div id="send-checkin-again">
       <p>Click the button below to send this checkin to your Micropub endpoint again.</p>
       <a class="ui small green button" id="post-checkin" href="">Send Again</a>
@@ -93,10 +93,10 @@
         <pre id="preview-micropub-payload" style="font-size: 11px;line-height: 13px;"><?= htmlspecialchars($hentry_checkin) ?></pre>
       </div>
     </div>
-
-  <? else: ?>
+  </div>
+  <div id="last-checkin-none" class="<?= $user->last_checkin_payload ? 'hidden' : '' ?>">
     <p>OwnYourSwarm hasn't received any checkins from your account yet. Once you check in to a venue on Swarm, you will be able to see your last checkin here.</p>
-  <? endif ?>
+  </div>
 </div>
 
 <br>
@@ -137,6 +137,9 @@ $(function(){
     $.post("/checkin/preview.json", {
       checkin: $("#import_checkin_id").val()
     }, function(response){
+      $("#last-checkin-none").addClass("hidden");
+      $("#last-checkin-preview").removeClass("hidden");
+
       $("#send-checkin-again").addClass("hidden");
       $("#preview-checkin").removeClass("loading");
       $("#preview-swarm-json").text(response.swarm);
