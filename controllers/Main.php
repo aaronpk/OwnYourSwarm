@@ -5,6 +5,7 @@ use ProcessCheckin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use ORM;
+use p3k\Multipart;
 
 class Main extends Controller {
 
@@ -26,10 +27,12 @@ class Main extends Controller {
     if(!$this->currentUser($response))
       return $response;
 
-    if($this->user->last_checkin_payload)
+    if($this->user->last_checkin_payload) {
       $hentry = ProcessCheckin::checkinToHEntry(json_decode($this->user->last_checkin_payload, true), $user);
-    else 
+      list($hentry, $content_type) = ProcessCheckin::buildPOSTPayload($this->user, $hentry, true);
+    } else {
       $hentry = false;
+    }
 
     $response->setContent(view('dashboard', [
       'title' => 'OwnYourSwarm',
@@ -39,13 +42,29 @@ class Main extends Controller {
     return $response;
   }
 
+  public function save_user_preferences(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    if($request->get('micropub_style')) {
+      $this->user->micropub_style = $request->get('micropub_style');
+      $this->user->save();
+    }
+
+    $response->headers->set('Content-Type', 'application/json');
+    $response->setContent(json_encode(['result'=>'ok']));
+    return $response;
+  }
+
   public function test_post_checkin(Request $request, Response $response) {
     if(!$this->currentUser($response))
       return $response;
 
     $hentry = ProcessCheckin::checkinToHEntry(json_decode($this->user->last_checkin_payload, true), $user);
 
-    $info = micropub_post($this->user, $hentry);
+    list($params, $content_type) = ProcessCheckin::buildPOSTPayload($this->user, $hentry);
+
+    $info = micropub_post($this->user, $params, $content_type);
 
     if($info['code'] == 201 && isset($info['headers']['Location'])) {
       $canonical_url = $info['headers']['Location'][0];

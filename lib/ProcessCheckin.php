@@ -89,7 +89,9 @@ class ProcessCheckin {
       $checkin->mf2_data = json_encode($entry, JSON_UNESCAPED_SLASHES);
       $checkin->save();
 
-      $micropub_response = micropub_post($user, $entry);
+      list($params, $content_type) = self::buildPOSTPayload($user, $entry);
+
+      $micropub_response = micropub_post($user, $params, $content_type);
 
       if(in_array($micropub_response['code'],[201,202]) && isset($micropub_response['headers']['Location'])) {
         $canonical_url = $micropub_response['headers']['Location'][0];
@@ -150,7 +152,7 @@ class ProcessCheckin {
               'photo' => $new_photos
             ]
           ];
-          $micropub_response = micropub_post($user, $update);
+          $micropub_response = micropub_post($user, json_encode($update));
           if(in_array($micropub_response['code'],[200,201,202,204])) {
             echo "Update of ".$canonical_url." was successful\n";
 
@@ -359,6 +361,86 @@ class ProcessCheckin {
     $entry['properties']['checkin'] = [$hcard];
 
     return $entry;
+  }
+
+  public static function jsonToFormEncoded($json) {
+    // Convert a Micropub JSON request to form-encoded parameters
+    $params = [];
+
+    $params['h'] = str_replace('h-', '', $json['type'][0]);
+
+    foreach($json['properties'] as $key=>$val) {
+      if(count($val) > 1) {
+        $params[$key] = [];
+        foreach($val as $v)
+          $params[$key][] = self::getPlaintextValue($v);
+      } else {
+        $params[$key] = self::getPlaintextValue($val[0]);
+      }
+    }
+
+    if(!isset($params['content']))
+      $params['content'] = '';
+
+    $params['content'] = 'Checked in at '.$json['properties']['checkin'][0]['properties']['name'][0] 
+      . ($params['content'] ? '. ' . $params['content'] : '');
+
+    return $params;
+  }
+
+  public static function buildPOSTPayload($user, $params, $prettyprint=false) {
+    if($user->micropub_style == 'json') {
+      $payload = json_encode($params, JSON_UNESCAPED_SLASHES+($prettyprint ? JSON_PRETTY_PRINT : 0));
+      $content_type = 'json';
+    } else {
+      $payload = ProcessCheckin::jsonToFormEncoded($params);
+      if(isset($payload['photo'])) {
+        $multipart = new p3k\Multipart();
+
+        if($prettyprint == false) {
+          // Download photos to temp file and add to the request
+          $finfo = finfo_open(FILEINFO_MIME_TYPE);
+          $prop = count($payload['photo']) > 1 ? 'photo[]' : 'photo';
+          foreach($payload['photo'] as $photo) {
+            $file_path = tempnam(sys_get_temp_dir(), 'fsq');
+            file_put_contents($file_path, file_get_contents($photo));
+            $mimetype = finfo_file($finfo, $file_path);
+            $multipart->addFile($prop, $file_path, $mimetype);
+          }
+        }
+
+        unset($payload['photo']);
+        $multipart->addArray($payload);
+        $payload = $multipart->data();
+        $content_type = $multipart->contentType();
+      } else {
+        $payload = http_build_query($payload);
+        $payload = preg_replace('/%5B[0-9]+%5D/', '%5B%5D', $payload); // change [0] to []
+        $content_type = 'form';
+      }
+      if($prettyprint) {
+        $payload = str_replace('&', "&\n", $payload);
+        $payload = urldecode($payload);
+      }
+    }
+
+    return [$payload, $content_type];
+  }
+
+  private static function getPlaintextValue($val) {
+    if(is_string($val))
+      return $val;
+
+    if(is_array($val)) {
+      if(isset($val['properties']['url']))
+        return $val['properties']['url'][0];
+      elseif(isset($val['value']))
+        return $val['value'];
+      else
+        return $val;
+    }
+
+    return null;
   }
 
 }

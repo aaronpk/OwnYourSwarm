@@ -9,7 +9,8 @@
     "cebe/markdown": "^1.1",
     "league/plates": "^3.3",
     "league/route": "1.*",
-    "p3k/caterpillar": "^0.1.1"
+    "p3k/caterpillar": "^0.1.1",
+    "p3k/multipart": "*"
   },
   "autoload": {
     "psr-4": {

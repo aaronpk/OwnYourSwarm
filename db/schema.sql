@@ -12,6 +12,7 @@ CREATE TABLE `users` (
   `micropub_success` tinyint(4) DEFAULT '0',
   `micropub_failures` tinyint(4) DEFAULT '0',
   `micropub_update_success` tinyint(4) DEFAULT '0',
+  `micropub_style` varchar(255) DEFAULT 'json',
   `date_created` datetime DEFAULT NULL,
   `last_login` datetime DEFAULT NULL,
   `last_micropub_response` text,

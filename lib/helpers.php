@@ -65,17 +65,25 @@ function k($a, $k, $default=null) {
   }
 }
 
-function micropub_post($user, $params) {
+function micropub_post($user, $params, $content_type='json') {
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $user->micropub_endpoint);
-  curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    'Authorization: Bearer ' . $user->micropub_access_token,
-    'Content-Type: application/json'
-  ));
   curl_setopt($ch, CURLOPT_POST, true);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_HEADER, true);
+
+  $httpheaders = array('Authorization: Bearer ' . $user->micropub_access_token);
+
+  if($content_type == 'json') {
+    $httpheaders[] = 'Content-Type: application/json';
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+  } elseif($content_type == 'form') {
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $params); // make sure to pass a string
+  } else {
+    $httpheaders[] = 'Content-type: ' . $content_type;
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $params); // make sure to pass a string from p3k\Multipart
+  }
+  curl_setopt($ch, CURLOPT_HTTPHEADER, $httpheaders);
   $response = curl_exec($ch);
 
   $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);

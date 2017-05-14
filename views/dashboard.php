@@ -23,11 +23,29 @@
 <br>
 
 <div class="panel">
-  <h3>Foursquare</h3>
+  <h3>Micropub Options</h3>
 
-  <p>Your account is connected to the Foursquare account <b><?= $user->foursquare_url ?: $user->foursquare_user_id ?></b>.</p>
+  <p>Choose how you would like OwnYourSwarm to send checkins to your website. If your software doesn't support checkins natively, you can use the "Simple" option to have it send a plaintext version of the checkins, which will appear on your site like regular notes.</p>
 
-  <a class="ui tiny yellow button" class="disconnect-foursquare" href="/foursquare/disconnect">Disconnect Foursquare</a>
+  <div class="ui form">
+    <div class="grouped fields" id="micropub_style_option">
+
+      <div class="field">
+        <div class="ui radio checkbox">
+          <input type="radio" name="micropub_style" <?= $user->micropub_style == 'json' ? 'checked="checked"' : '' ?>class="hidden" value="json">
+          <label>JSON - This will send a JSON request with the checkin data in an h-card in the "checkin" property.</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui radio checkbox">
+          <input type="radio" name="micropub_style" <?= $user->micropub_style == 'simple' ? 'checked="checked"' : '' ?> class="hidden" value="simple">
+          <label>Simple - This will send a form-encoded request with the checkin information in the post contents, e.g. "Checked in to ______". Photos will be sent as a file upload.</label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <br>
@@ -36,7 +54,7 @@
   <h3>Import Past Checkin</h3>
 
   <p>Note: This feature is in super beta! There is currently no feedback once you click a button.</p>
-  <p>Enter one of your checkin IDs, and that checkin will be re-processed. If the checkin has already been sent to your site, it will not be sent again. If you want to re-send a checkin that has already been sent once, you can click the "Reset" button to delete any trace of a specific checkin from OwnYourSwarm.</p>
+  <p>Enter one of your checkin IDs, and that checkin will be re-processed. If the checkin has already been sent to your site, and if there are any new photos, this will run a Micropub update to add the new photos. If you want to re-send a checkin that has already been sent, you can click the "Reset" button to delete any trace of a specific checkin from OwnYourSwarm.</p>
 
   <form>
     <div class="ui input">
@@ -67,7 +85,10 @@
       </div>
       <div style="flex: 1 0; border: 1px #e5e5e5 solid; margin: 2px; overflow-x: scroll;">
         <h4>h-entry Checkin Object</h4>
-        <pre style="font-size: 11px;line-height: 13px;"><?= htmlspecialchars(json_encode($hentry_checkin, JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES)) ?></pre>
+        <?php if($user->micropub_style == 'simple'): ?>
+          <p>Note: This is a preview of the post request. For multipart requests, the photo is not shown below. Linebreaks in form-encoded requests are for display purposes only. Form-encoded requests are displayed in a simplified form to be more readable.</p>
+        <?php endif; ?>
+        <pre style="font-size: 11px;line-height: 13px;"><?= htmlspecialchars($hentry_checkin) ?></pre>
       </div>
     </div>
 
@@ -78,8 +99,28 @@
 
 <br>
 
+<div class="panel">
+  <h3>Foursquare</h3>
+
+  <p>Your account is connected to the Foursquare account <b><?= $user->foursquare_url ?: $user->foursquare_user_id ?></b>.</p>
+
+  <a class="ui tiny yellow button" class="disconnect-foursquare" href="/foursquare/disconnect">Disconnect Foursquare</a>
+</div>
+
+<br>
+
 <script>
 $(function(){
+  $('.ui.radio.checkbox').checkbox();
+
+  $("#micropub_style_option .radio").click(function(){
+    $.post('/user/prefs.json', {
+      micropub_style: $("input[name=micropub_style]:checked").val()
+    }, function(){
+      window.location.reload();
+    });
+  });
+
   $("#post-checkin").click(function(){
     $("#post-checkin").addClass("loading");
     $.post("/checkin/test.json", function(response){

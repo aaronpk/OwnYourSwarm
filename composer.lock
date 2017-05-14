@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "5d71dfa12b88782fa7c6e9502f42fd9e",
+    "content-hash": "eafca2d5c8ecc78e3536bdfc859b11aa",
     "packages": [
         {
             "name": "barnabywalters/mf-cleaner",
@@ -108,16 +108,16 @@
         },
         {
             "name": "indieauth/client",
-            "version": "0.2.0",
+            "version": "0.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/indieauth-client-php.git",
-                "reference": "4b9bd766a92b8abbe420f5889bf7ebac7678151d"
+                "reference": "f5f6efad79334d1ff9370fe4dce8ccf4814820fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/4b9bd766a92b8abbe420f5889bf7ebac7678151d",
-                "reference": "4b9bd766a92b8abbe420f5889bf7ebac7678151d",
+                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/f5f6efad79334d1ff9370fe4dce8ccf4814820fa",
+                "reference": "f5f6efad79334d1ff9370fe4dce8ccf4814820fa",
                 "shasum": ""
             },
             "require": {
@@ -143,7 +143,7 @@
                 }
             ],
             "description": "IndieAuth Client Library",
-            "time": "2017-02-09T23:42:05+00:00"
+            "time": "2017-04-26T21:44:35+00:00"
         },
         {
             "name": "indieweb/link-rel-parser",
@@ -193,16 +193,16 @@
         },
         {
             "name": "indieweb/mention-client",
-            "version": "1.1.6",
+            "version": "1.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/mention-client-php.git",
-                "reference": "eed3468f2237e9a03543a8edf14d83d4c2904667"
+                "reference": "bc45c6051ae9aa5e0905389ad9c863d738be7b03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/mention-client-php/zipball/eed3468f2237e9a03543a8edf14d83d4c2904667",
-                "reference": "eed3468f2237e9a03543a8edf14d83d4c2904667",
+                "url": "https://api.github.com/repos/indieweb/mention-client-php/zipball/bc45c6051ae9aa5e0905389ad9c863d738be7b03",
+                "reference": "bc45c6051ae9aa5e0905389ad9c863d738be7b03",
                 "shasum": ""
             },
             "require": {
@@ -231,7 +231,7 @@
             ],
             "description": "Client library for sending webmention and pingback notifications",
             "homepage": "https://github.com/indieweb/mention-client-php",
-            "time": "2016-04-15T08:11:41+00:00"
+            "time": "2017-04-03T16:21:23+00:00"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -277,23 +277,23 @@
         },
         {
             "name": "j4mie/idiorm",
-            "version": "v1.5.2",
+            "version": "v1.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/j4mie/idiorm.git",
-                "reference": "00b5fcd6e615a8572577eae401f80e41525efd5e"
+                "reference": "f2f170c44af4761fef8ef34d6dbc237cd95df799"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/j4mie/idiorm/zipball/00b5fcd6e615a8572577eae401f80e41525efd5e",
-                "reference": "00b5fcd6e615a8572577eae401f80e41525efd5e",
+                "url": "https://api.github.com/repos/j4mie/idiorm/zipball/f2f170c44af4761fef8ef34d6dbc237cd95df799",
+                "reference": "f2f170c44af4761fef8ef34d6dbc237cd95df799",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.6"
+                "phpunit/phpunit": "^4.8"
             },
             "type": "library",
             "autoload": {
@@ -334,7 +334,7 @@
                 "orm",
                 "query builder"
             ],
-            "time": "2016-12-14T06:28:26+00:00"
+            "time": "2017-03-21T01:31:25+00:00"
         },
         {
             "name": "league/container",
@@ -641,6 +641,42 @@
             "time": "2017-03-19T19:58:18+00:00"
         },
         {
+            "name": "p3k/multipart",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aaronpk/php-multipart-encoder.git",
+                "reference": "f5400011b20046cebbdfed686d051fb2aa600a14"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aaronpk/php-multipart-encoder/zipball/f5400011b20046cebbdfed686d051fb2aa600a14",
+                "reference": "f5400011b20046cebbdfed686d051fb2aa600a14",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/p3k/Multipart.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache 2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Parecki",
+                    "homepage": "http://aaronparecki.com"
+                }
+            ],
+            "description": "Multipart Encoding Library",
+            "time": "2015-07-16T19:28:02+00:00"
+        },
+        {
             "name": "pda/pheanstalk",
             "version": "dev-master",
             "source": {
@@ -742,16 +778,16 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v2.8.18",
+            "version": "v2.8.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "88af747e7af17d8d7d439ad4639dc3e23ddd3edd"
+                "reference": "cfa9013809ad18514855144d14bb321cf4673561"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/88af747e7af17d8d7d439ad4639dc3e23ddd3edd",
-                "reference": "88af747e7af17d8d7d439ad4639dc3e23ddd3edd",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/cfa9013809ad18514855144d14bb321cf4673561",
+                "reference": "cfa9013809ad18514855144d14bb321cf4673561",
                 "shasum": ""
             },
             "require": {
@@ -793,7 +829,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-04T12:20:59+00:00"
+            "time": "2017-05-01T14:31:55+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",

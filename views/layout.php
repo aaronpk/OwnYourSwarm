@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/assets/style.css">
 
     <script src="/assets/jquery-3.2.0.min.js"></script>
+    <script src="/semantic-ui/semantic.min.js"></script>
   </head>
 
 <body>
