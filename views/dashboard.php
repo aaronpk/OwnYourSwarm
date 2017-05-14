@@ -53,7 +53,7 @@
 <div class="panel">
   <h3>Import Past Checkin</h3>
 
-  <p>Note: This feature is in super beta! There is currently no feedback once you click a button.</p>
+  <p>Note: This feature is in super beta! There is currently no feedback once you click "Import".</p>
   <p>Enter one of your checkin IDs, and that checkin will be re-processed. If the checkin has already been sent to your site, and if there are any new photos, this will run a Micropub update to add the new photos. If you want to re-send a checkin that has already been sent, you can click the "Reset" button to delete any trace of a specific checkin from OwnYourSwarm.</p>
 
   <form>
@@ -96,6 +96,7 @@
   </div>
   <div id="last-checkin-none" class="<?= $user->last_checkin_payload ? 'hidden' : '' ?>">
     <p>OwnYourSwarm hasn't received any checkins from your account yet. Once you check in to a venue on Swarm, you will be able to see your last checkin here.</p>
+    <p>You can also get a checkin ID from <a href="<?= $user->foursquare_url ?>/history">your history</a> to test with.</p>
   </div>
 </div>
 
