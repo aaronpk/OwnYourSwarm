@@ -394,14 +394,14 @@ class ProcessCheckin {
       $content_type = 'json';
     } else {
       $payload = ProcessCheckin::jsonToFormEncoded($params);
-      if(isset($payload['photo'])) {
+      if(isset($params['properties']['photo'])) {
         $multipart = new p3k\Multipart();
 
         if($prettyprint == false) {
           // Download photos to temp file and add to the request
           $finfo = finfo_open(FILEINFO_MIME_TYPE);
-          $prop = count($payload['photo']) > 1 ? 'photo[]' : 'photo';
-          foreach($payload['photo'] as $photo) {
+          $prop = count($params['properties']) > 1 ? 'photo[]' : 'photo';
+          foreach($params['properties']['photo'] as $photo) {
             $file_path = tempnam(sys_get_temp_dir(), 'fsq');
             file_put_contents($file_path, file_get_contents($photo));
             $mimetype = finfo_file($finfo, $file_path);
