@@ -60,6 +60,7 @@
     <div class="ui input">
       <input type="text" id="import_checkin_id" placeholder="checkin ID">
     </div>
+    <a class="ui small yellow button" id="preview-checkin" href="">Preview</a>
     <a class="ui small green button" id="import-checkin" href="">Import</a>
     <a class="ui small red button" id="reset-checkin" href="">Reset</a>
   </form>
@@ -72,23 +73,24 @@
   <h3>Last Checkin</h3>
 
   <? if($user->last_checkin_payload): ?>
-    <p>Click the button below to send this checkin to your Micropub endpoint again.</p>
-
-    <a class="ui small green button" id="post-checkin" href="">Send Again</a>
+    <div id="send-checkin-again">
+      <p>Click the button below to send this checkin to your Micropub endpoint again.</p>
+      <a class="ui small green button" id="post-checkin" href="">Send Again</a>
+    </div>
 
     <pre id="micropub-response" class="hidden"></pre>
 
     <div style="display: flex; flex-direction: row; margin-top: 1em;">
-      <div style="flex: 1 0; border: 1px #e5e5e5 solid; margin: 2px; overflow-x: scroll;">
+      <div style="flex: 1 0; border: 1px #e5e5e5 solid; margin: 2px; padding: 2px; overflow-x: scroll;">
         <h4>Swarm Checkin Object</h4>
-        <pre style="font-size: 11px;line-height: 13px;"><?= htmlspecialchars(json_encode(json_decode($user->last_checkin_payload), JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES)) ?></pre>
+        <pre id="preview-swarm-json" style="font-size: 11px;line-height: 13px;"><?= htmlspecialchars(json_encode(json_decode($user->last_checkin_payload), JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES)) ?></pre>
       </div>
-      <div style="flex: 1 0; border: 1px #e5e5e5 solid; margin: 2px; overflow-x: scroll;">
+      <div style="flex: 1 0; border: 1px #e5e5e5 solid; margin: 2px; padding: 2px; overflow-x: scroll;">
         <h4>h-entry Checkin Object</h4>
         <?php if($user->micropub_style == 'simple'): ?>
           <p>Note: This is a preview of the post request. For multipart requests, the photo is not shown below. Linebreaks in form-encoded requests are for display purposes only. Form-encoded requests are displayed in a simplified form to be more readable.</p>
         <?php endif; ?>
-        <pre style="font-size: 11px;line-height: 13px;"><?= htmlspecialchars($hentry_checkin) ?></pre>
+        <pre id="preview-micropub-payload" style="font-size: 11px;line-height: 13px;"><?= htmlspecialchars($hentry_checkin) ?></pre>
       </div>
     </div>
 
@@ -117,7 +119,7 @@ $(function(){
     $.post('/user/prefs.json', {
       micropub_style: $("input[name=micropub_style]:checked").val()
     }, function(){
-      window.location.reload();
+      $("#preview-checkin").click();
     });
   });
 
@@ -126,6 +128,19 @@ $(function(){
     $.post("/checkin/test.json", function(response){
       $("#post-checkin").removeClass("loading");
       $("#micropub-response").removeClass("hidden").text(response.response);
+    });
+    return false;
+  });
+
+  $("#preview-checkin").click(function(){
+    $("#preview-checkin").addClass("loading");
+    $.post("/checkin/preview.json", {
+      checkin: $("#import_checkin_id").val()
+    }, function(response){
+      $("#send-checkin-again").addClass("hidden");
+      $("#preview-checkin").removeClass("loading");
+      $("#preview-swarm-json").text(response.swarm);
+      $("#preview-micropub-payload").text(response.micropub);
     });
     return false;
   });

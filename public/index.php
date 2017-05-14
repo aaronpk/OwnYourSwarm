@@ -14,6 +14,8 @@ $router->addRoute('GET', '/', 'Controllers\\Main::index');
 $router->addRoute('GET', '/docs', 'Controllers\\Main::docs');
 $router->addRoute('GET', '/dashboard', 'Controllers\\Main::dashboard');
 $router->addRoute('POST', '/checkin/test.json', 'Controllers\\Main::test_post_checkin');
+$router->addRoute('GET', '/checkin/preview.json', 'Controllers\\Main::preview_checkin');
+$router->addRoute('POST', '/checkin/preview.json', 'Controllers\\Main::preview_checkin');
 $router->addRoute('POST', '/checkin/import.json', 'Controllers\\Main::import_checkin');
 $router->addRoute('POST', '/checkin/reset.json', 'Controllers\\Main::reset_checkin');
 $router->addRoute('POST', '/user/prefs.json', 'Controllers\\Main::save_user_preferences');

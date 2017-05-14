@@ -83,6 +83,40 @@ class Main extends Controller {
     return $response;
   }
 
+  public function preview_checkin(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    if(!$request->get('checkin')) {
+      if($this->user->last_checkin_payload) {
+        $tmp = json_decode($this->user->last_checkin_payload, true);
+        $checkin_id = $tmp['id'];
+      } else {
+        return $response;
+      }
+    } else {
+      $checkin_id = $request->get('checkin');
+    }
+
+    $swarm = ProcessCheckin::loadFoursquareCheckin($this->user, $checkin_id);
+
+    if(!isset($swarm['response']['checkin'])) {
+      $swarm = false;
+      $micropub = false;
+    } else {
+      $swarm = $swarm['response']['checkin'];
+      $hentry = ProcessCheckin::checkinToHEntry($swarm, $user);
+      list($micropub, $content_type) = ProcessCheckin::buildPOSTPayload($this->user, $hentry, true);
+    }
+
+    $response->headers->set('Content-Type', 'application/json');
+    $response->setContent(json_encode([
+      'swarm' => json_encode($swarm, JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES),
+      'micropub' => $micropub
+    ]));
+    return $response;
+  }
+
   public function import_checkin(Request $request, Response $response) {
     if(!$this->currentUser($response))
       return $response;

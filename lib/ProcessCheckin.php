@@ -37,6 +37,13 @@ class ProcessCheckin {
     ]);
   }
 
+  public static function loadFoursquareCheckin($user, $checkin_id) {
+    $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin_id.'?v=20170319&oauth_token='.$user->foursquare_access_token);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $info = json_decode(curl_exec($ch), true);
+    return $info;
+  }
+
   public static function run($user_id, $checkin_id, $is_import=false) {
     $user = ORM::for_table('users')->find_one($user_id);
     if(!$user) {
@@ -48,9 +55,7 @@ class ProcessCheckin {
     echo "User: " . $user->url . "\n";
     echo "Checkin: " . $checkin_id . "\n";
 
-    $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin_id.'?v=20170319&oauth_token='.$user->foursquare_access_token);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $info = json_decode(curl_exec($ch), true);
+    $info = self::loadFoursquareCheckin($user, $checkin_id);
 
     if(!isset($info['response']['checkin'])) {
       echo "Foursquare API returned invalid data for checkin: ".$checkin_id."\n";
