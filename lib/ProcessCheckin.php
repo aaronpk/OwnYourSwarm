@@ -44,6 +44,16 @@ class ProcessCheckin {
     return $info;
   }
 
+  public static function getFoursquareCheckins($user, $params=[]) {
+    $params['v'] = '20170319';
+    $params['oauth_token'] = $user->foursquare_access_token;
+
+    $ch = curl_init('https://api.foursquare.com/v2/users/self/checkins?'.http_build_query($params));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $info = json_decode(curl_exec($ch), true);
+    return $info;
+  }
+
   public static function run($user_id, $checkin_id, $is_import=false) {
     $user = ORM::for_table('users')->find_one($user_id);
     if(!$user) {

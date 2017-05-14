@@ -5,6 +5,7 @@ use ProcessCheckin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use ORM;
+use DateTime, DateTimeZone;
 use p3k\Multipart;
 
 class Main extends Controller {
@@ -53,6 +54,36 @@ class Main extends Controller {
 
     $response->headers->set('Content-Type', 'application/json');
     $response->setContent(json_encode(['result'=>'ok']));
+    return $response;
+  }
+
+  public function get_recent_checkins(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    $info = ProcessCheckin::getFoursquareCheckins($this->user, [
+      'limit' => 10,
+      'sort' => 'newestfirst'
+    ]);
+
+    $checkins = [];
+    if(isset($info['response']['checkins']['items']) && count($info['response']['checkins']['items'])) {
+      foreach($info['response']['checkins']['items'] as $checkin) {
+        $date = DateTime::createFromFormat('U', $checkin['createdAt']);
+        $tz = offset_to_timezone($checkin['timeZoneOffset'] * 60);
+        $date->setTimeZone($tz);
+
+        $checkins[] = [
+          'id' => $checkin['id'],
+          'venue' => $checkin['venue']['name'],
+          'date' => $date->format('c'),
+          'date_short' => $date->format('M j, g:ia')
+        ];
+      }
+    }
+
+    $response->headers->set('Content-Type', 'application/json');
+    $response->setContent(json_encode(['checkins'=>$checkins]));
     return $response;
   }
 

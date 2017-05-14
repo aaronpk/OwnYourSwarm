@@ -18,6 +18,7 @@ $router->addRoute('GET', '/checkin/preview.json', 'Controllers\\Main::preview_ch
 $router->addRoute('POST', '/checkin/preview.json', 'Controllers\\Main::preview_checkin');
 $router->addRoute('POST', '/checkin/import.json', 'Controllers\\Main::import_checkin');
 $router->addRoute('POST', '/checkin/reset.json', 'Controllers\\Main::reset_checkin');
+$router->addRoute('GET', '/checkin/recent.json', 'Controllers\\Main::get_recent_checkins');
 $router->addRoute('POST', '/user/prefs.json', 'Controllers\\Main::save_user_preferences');
 
 $router->addRoute('GET', '/checkin/{checkin}/{hash}', 'Controllers\\Foursquare::comment');

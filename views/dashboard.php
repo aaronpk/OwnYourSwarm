@@ -51,6 +51,16 @@
 <br>
 
 <div class="panel">
+  <h3>Load Checkins</h3>
+  <a class="ui small yellow button" id="load-checkins" href="">Load Recent Checkins</a>
+
+  <ul id="recent-checkin-list" class="hidden">
+  </ul>
+</div>
+
+<br>
+
+<div class="panel">
   <h3>Import Past Checkin</h3>
 
   <p>Note: This feature is in super beta! There is currently no feedback once you click "Import".</p>
@@ -64,13 +74,12 @@
     <a class="ui small green button" id="import-checkin" href="">Import</a>
     <a class="ui small red button" id="reset-checkin" href="">Reset</a>
   </form>
-
 </div>
 
 <br>
 
 <div class="panel">
-  <h3>Last Checkin</h3>
+  <h3>Preview Checkin Payload</h3>
 
   <div id="last-checkin-preview" class="<?= $user->last_checkin_payload ? '' : 'hidden' ?>">
     <div id="send-checkin-again">
@@ -124,6 +133,34 @@ $(function(){
     });
   });
 
+  $("#load-checkins").click(function(){
+    $("#load-checkins").addClass("loading");
+    $.get("/checkin/recent.json", function(response){
+      $("#load-checkins").removeClass("loading");
+      if(response.checkins.length) {
+        $("#recent-checkin-list").text("");
+        for(var i in response.checkins) {
+          $("#recent-checkin-list").append(
+            "<li>" +
+              "<a href=\"\" data-checkin=\""+response.checkins[i].id+"\">"+response.checkins[i].venue+"</a>" +
+              " " + response.checkins[i].date_short +
+            "</li>"
+          );
+        }
+        $("#recent-checkin-list a").unbind("click").bind("click", function(){
+          $("#import_checkin_id").val($(this).data("checkin"));
+          $("#preview-checkin").click();
+          document.getElementById("preview-checkin").scrollIntoView();
+          return false;
+        });
+        $("#recent-checkin-list").removeClass("hidden");
+      } else {
+        $("#recent-checkin-list").addClass("hidden");
+      }
+    });
+    return false;
+  });
+
   $("#post-checkin").click(function(){
     $("#post-checkin").addClass("loading");
     $.post("/checkin/test.json", function(response){
@@ -145,6 +182,8 @@ $(function(){
       $("#preview-checkin").removeClass("loading");
       $("#preview-swarm-json").text(response.swarm);
       $("#preview-micropub-payload").text(response.micropub);
+
+      document.getElementById("last-checkin-preview").scrollIntoView();
     });
     return false;
   });
