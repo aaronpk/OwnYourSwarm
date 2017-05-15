@@ -37,7 +37,7 @@ class ProcessCheckin {
     ]);
   }
 
-  public static function loadFoursquareCheckin($user, $checkin_id) {
+  public static function getFoursquareCheckin($user, $checkin_id) {
     $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin_id.'?v=20170319&oauth_token='.$user->foursquare_access_token);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $info = json_decode(curl_exec($ch), true);
@@ -65,7 +65,7 @@ class ProcessCheckin {
     echo "User: " . $user->url . "\n";
     echo "Checkin: " . $checkin_id . "\n";
 
-    $info = self::loadFoursquareCheckin($user, $checkin_id);
+    $info = self::getFoursquareCheckin($user, $checkin_id);
 
     if(!isset($info['response']['checkin'])) {
       echo "Foursquare API returned invalid data for checkin: ".$checkin_id."\n";
@@ -203,10 +203,10 @@ class ProcessCheckin {
       $checkin->save();
     }
 
-    if($is_import && $canonical_url) {
-      q()->queue('Backfeed', 'runForCheckin', [$checkin->id], [
-        'delay' => 2
-      ]);
+    if($canonical_url) {
+      // There probably won't be any feedback for new checkins, but this also catches
+      // backfeed on manually imported and offline checkins
+      Backfeed::processBackfeedForSwarmCheckin($user, $checkin->foursquare_data);
     }
   }
 

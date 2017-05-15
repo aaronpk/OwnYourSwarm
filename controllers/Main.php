@@ -129,7 +129,7 @@ class Main extends Controller {
       $checkin_id = $request->get('checkin');
     }
 
-    $swarm = ProcessCheckin::loadFoursquareCheckin($this->user, $checkin_id);
+    $swarm = ProcessCheckin::getFoursquareCheckin($this->user, $checkin_id);
 
     if(!isset($swarm['response']['checkin'])) {
       $swarm = false;

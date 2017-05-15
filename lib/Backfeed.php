@@ -93,7 +93,7 @@ class Backfeed {
     self::processBackfeedForSwarmCheckin($user, $info['response']['checkin']);
   }
 
-  private static function processBackfeedForSwarmCheckin($user, $checkin_data) {
+  public static function processBackfeedForSwarmCheckin($user, $checkin_data) {
     $checkin = ORM::for_table('checkins')
       ->where('user_id', $user->id)
       ->where('foursquare_checkin_id', $checkin_data['id'])
