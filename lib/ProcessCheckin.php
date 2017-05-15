@@ -206,7 +206,7 @@ class ProcessCheckin {
     if($canonical_url) {
       // There probably won't be any feedback for new checkins, but this also catches
       // backfeed on manually imported and offline checkins
-      Backfeed::processBackfeedForSwarmCheckin($user, $checkin->foursquare_data);
+      Backfeed::processBackfeedForSwarmCheckin($user, json_decode($checkin->foursquare_data, true));
     }
   }
 
