@@ -30,7 +30,7 @@ foreach($users as $user) {
     foreach($info['response']['checkins']['items'] as $data) {
 
       // Avoid importing checkins from before the user was using OwnYourSwarm
-      if($data['createdAt'] < strtotime($user->date_created))
+      if($data['createdAt'] < strtotime($user->date_created) || $data['createdAt'] < strtotime('2017-05-16T09:00:00+0200'))
         continue;
 
       // Check the database to see if the checkin was already imported
