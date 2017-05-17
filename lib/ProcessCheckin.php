@@ -375,6 +375,21 @@ class ProcessCheckin {
 
     $entry['properties']['checkin'] = [$hcard];
 
+    # Add the event the user checked in to.
+    # For now, this is only for the plaintext fallback mode, until we standardize around
+    # how this should be marked up in Microformats. This will be removed when building the
+    # JSON post request later, and used by the form-encoded format.
+    if(isset($checkin['event'])) {
+      $event = [
+        'type' => ['h-event'],
+        'properties' => [
+          'name' => $checkin['event']['name']
+        ],
+        'value' => $checkin['event']['name']
+      ];
+      $entry['properties']['checkin'][] = $event;
+    }
+
     return $entry;
   }
 
@@ -394,10 +409,20 @@ class ProcessCheckin {
       }
     }
 
+    if(isset($params['checkin'][1])) {
+      $event = $params['checkin'][1];
+      unset($params['checkin'][1]);
+      $params['checkin'] = $params['checkin'][0];
+    } else {
+      $event = false;
+    }
+
     if(!isset($params['content']))
       $params['content'] = '';
 
+    // Include event info in the content
     $params['content'] = 'Checked in at '.$json['properties']['checkin'][0]['properties']['name'][0] 
+      . ($event ? ' for '.$event : '')
       . ($params['content'] ? '. ' . $params['content'] : '');
 
     // Add a Geo URI with the location
@@ -410,6 +435,8 @@ class ProcessCheckin {
 
   public static function buildPOSTPayload($user, $params, $prettyprint=false) {
     if($user->micropub_style == 'json') {
+      # Remove the event checkin if set. See `checkinToHEntry` above for details.
+      unset($params['properties']['checkin'][1]);
       $payload = json_encode($params, JSON_UNESCAPED_SLASHES+($prettyprint ? JSON_PRETTY_PRINT : 0));
       $content_type = 'json';
     } else {
