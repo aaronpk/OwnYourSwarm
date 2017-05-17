@@ -400,6 +400,11 @@ class ProcessCheckin {
     $params['content'] = 'Checked in at '.$json['properties']['checkin'][0]['properties']['name'][0] 
       . ($params['content'] ? '. ' . $params['content'] : '');
 
+    // Add a Geo URI with the location
+    if(isset($json['properties']['checkin'][0]['properties']['latitude'])) {
+      $params['location'] = 'geo:'.$json['properties']['checkin'][0]['properties']['latitude'][0].','.$json['properties']['checkin'][0]['properties']['longitude'][0];
+    }
+
     return $params;
   }
 
