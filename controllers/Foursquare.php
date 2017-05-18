@@ -163,6 +163,10 @@ class Foursquare extends Controller {
 
     $checkin = ORM::for_table('checkins')->find_one($webmention->checkin_id);
 
+    $user = ORM::for_table('users')
+      ->where('id', $checkin->user_id)
+      ->find_one();
+
     $date = new DateTime($webmention->date_created);
     $date->setTimeZone(offset_to_timezone($checkin->tzoffset));
 
@@ -170,7 +174,8 @@ class Foursquare extends Controller {
       'title' => 'Swarm Checkin',
       'checkin' => $checkin,
       'comment' => $webmention,
-      'published' => $date
+      'published' => $date,
+      'simple' => $user->micropub_style == 'simple',
     ]));
     return $response;
   }

@@ -32,11 +32,11 @@
           <span><?= $this->e($comment->author_name) ?></span>
           <span class="e-content p-name">liked your checkin</span>
         <?php elseif($comment->type == 'coin'): ?>
-          <span class="e-content p-name"><?= $comment->content ?></span>
+          <span class="e-content p-name"><?= ($simple ? ('<b>+'.$comment->coins.'</b> ') : '') . $comment->content ?></span>
         <?php endif ?>
       </span>
     <?php endif ?>
-    <?php if($comment->type == 'coin'): ?>
+    <?php if($comment->type == 'coin' && !$simple): ?>
       <span class="score">+<span class="p-swarm-coins"><?= $comment->coins ?></span></span>
     <?php endif ?>
   </div>

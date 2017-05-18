@@ -165,7 +165,6 @@ class FoursquarePermalink extends Controller {
                 $webmention->content .= "<br>\n";
               $webmention->content .= '<img src="'.$sticker_url.'" alt="'.htmlspecialchars($r['sticker']['name']).'">';
             }
-
             break;
           case 'coin': 
             $webmention->author_photo = $r['icon'];
@@ -193,7 +192,8 @@ class FoursquarePermalink extends Controller {
       'title' => 'Swarm Checkin',
       'checkin' => $checkin,
       'comment' => $webmention,
-      'published' => $date
+      'published' => $date,
+      'simple' => $user->micropub_style == 'simple',
     ]));
     return $response;
   }
