@@ -409,7 +409,7 @@ class ProcessCheckin {
       }
     }
 
-    if(isset($params['checkin'][1])) {
+    if(is_array($params['checkin']) && isset($params['checkin'][1])) {
       $event = $params['checkin'][1];
       unset($params['checkin'][1]);
       $params['checkin'] = $params['checkin'][0];
