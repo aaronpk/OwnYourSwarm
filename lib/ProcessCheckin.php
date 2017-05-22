@@ -257,6 +257,46 @@ class ProcessCheckin {
     }
   }
 
+  private static function replaceLinkedEntities($text, $entities) {
+    // Encode the string as JSON, which turns it into a string like
+    // "Snack \ud83d\udc69\ud83c\udffb\u200d\ud83c\udfa4 with Asha"
+    $json = json_encode($text);
+    // Split the JSON-encoded string to separate all the \uXXXX characters
+    if(preg_match_all('/(\\\u[a-h0-9]{4}|\\\"|.)/', trim($json,'"'), $matches)) {
+      $chars = $matches[0];
+    }
+
+    $offsets = []; // Keep track of which offsets have been modified
+    foreach($entities as $entity) {
+      if($entity['type'] == 'user') {
+        $s = $entity['indices'][0];
+        $e = $entity['indices'][1];
+
+        $offsets[] = $s;
+        $offsets[] = $e-1;
+
+        // Replace the text at the start and end offset with a hyperlink
+        $chars[$s] = json_encode('<a href=\"' . url_for_user($entity['id']) . '\">' . $chars[$s]);
+        $chars[$e-1] = json_encode($chars[$e-1] . '</a>');
+      }
+    }
+
+    $json = '';
+    // Put the JSON string back together
+    foreach($chars as $i=>$c) {
+      if(in_array($i, $offsets)) {
+        $json .= json_decode($c);
+      } else {
+        $json .= $c;
+      }
+    }
+
+    // JSON decode the string to get the final result
+    $html = json_decode('"'.$json.'"');
+
+    return $html;
+  }
+
   public static function checkinToHEntry($checkin, &$user) {
     $date = DateTime::createFromFormat('U', $checkin['createdAt']);
     $tz = offset_to_timezone($checkin['timeZoneOffset'] * 60);
@@ -275,17 +315,18 @@ class ProcessCheckin {
       $html = $checkin['shout'];
 
       if($checkin['entities']) {
+        $html = self::replaceLinkedEntities($html, $checkin['entities']);
         // Replace from right to left so the offsets aren't messed up
-        foreach(array_reverse($checkin['entities']) as $entity) {
-          if($entity['type'] == 'user') {
-            $new_html = mb_substr($html, 0, $entity['indices'][0])
-              . '<a href="' . url_for_user($entity['id']) . '">'
-              . mb_substr($html, $entity['indices'][0], $entity['indices'][1]-$entity['indices'][0])
-              . '</a>'
-              . mb_substr($html, $entity['indices'][1]);
-            $html = $new_html;
-          }
-        }
+        // foreach(array_reverse($checkin['entities']) as $entity) {
+        //   if($entity['type'] == 'user') {
+        //     $new_html = mb_substr($html, 0, $entity['indices'][0])
+        //       . '<a href="' . url_for_user($entity['id']) . '">'
+        //       . mb_substr($html, $entity['indices'][0], $entity['indices'][1]-$entity['indices'][0])
+        //       . '</a>'
+        //       . mb_substr($html, $entity['indices'][1]);
+        //     $html = $new_html;
+        //   }
+        // }
       }
 
       if($text == $html) {
