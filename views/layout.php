@@ -40,6 +40,7 @@
     </a>
     <?php if(session('me')) { ?>
       <a href="/dashboard" class="item">Dashboard</a>
+      <a href="/import" class="item">Import</a>
     <?php } ?>
     <a href="/docs" class="item">Docs</a>
     <?php if(session('me')) { ?>

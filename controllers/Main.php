@@ -28,6 +28,17 @@ class Main extends Controller {
     if(!$this->currentUser($response))
       return $response;
 
+    $response->setContent(view('dashboard', [
+      'title' => 'OwnYourSwarm',
+      'user' => $this->user,
+    ]));
+    return $response;
+  }
+
+  public function import(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
     if($this->user->last_checkin_payload) {
       $hentry = ProcessCheckin::checkinToHEntry(json_decode($this->user->last_checkin_payload, true), $user);
       list($hentry, $content_type) = ProcessCheckin::buildPOSTPayload($this->user, $hentry, true);
@@ -35,7 +46,7 @@ class Main extends Controller {
       $hentry = false;
     }
 
-    $response->setContent(view('dashboard', [
+    $response->setContent(view('import', [
       'title' => 'OwnYourSwarm',
       'user' => $this->user,
       'hentry_checkin' => $hentry

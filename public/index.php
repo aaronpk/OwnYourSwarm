@@ -13,6 +13,7 @@ $templates = new League\Plates\Engine(dirname(__FILE__).'/../views');
 $router->addRoute('GET', '/', 'Controllers\\Main::index');
 $router->addRoute('GET', '/docs', 'Controllers\\Main::docs');
 $router->addRoute('GET', '/dashboard', 'Controllers\\Main::dashboard');
+$router->addRoute('GET', '/import', 'Controllers\\Main::import');
 $router->addRoute('POST', '/checkin/test.json', 'Controllers\\Main::test_post_checkin');
 $router->addRoute('GET', '/checkin/preview.json', 'Controllers\\Main::preview_checkin');
 $router->addRoute('POST', '/checkin/preview.json', 'Controllers\\Main::preview_checkin');

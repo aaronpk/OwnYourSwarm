@@ -29,7 +29,7 @@ Authorization: Bearer xxxxxxxxxxxxxxxxxxxxxxx</code></pre>
 <section id="checkins">
 <h3><a href="#checkins"><span>🔗</span></a> Checkins</h3>
 
-<p>The request your Micropub endpoint receives will always be a JSON payload containing a Microformats 2 object describing the checkin.</p>
+<p>When your account is in JSON mode, the request your Micropub endpoint receives will always be a JSON payload containing a Microformats 2 object describing the checkin. If your account is set to "simple" then a simplified form-encoded request will be made instead.</p>
 
 <p>The basic structure of a JSON payload looks like the below.</p>
 
@@ -45,6 +45,13 @@ Authorization: Bearer xxxxxxxxxxxxxxxxxxxxxxx</code></pre>
   }
 }</pre>
 
+<p>The basic structure of a form-encoded POST payload looks like the below. Most web servers will parse this automatically. (Newlines are for display purposes only.</p>
+
+<pre>h=entry&amp;
+published=2017-03-24T17:30:32-07:00&amp;
+content=Checked in to PDX Airport
+</pre>
+
 <p>The properties in the h-entry will depend on the checkin. The set of properties possible is listed below. Note that in the Micropub JSON syntax, all properties will be arrays, even if there is only one value, e.g. the "published" date above.</p>
 
 <p>You can see an example of a full object after you connect OwnYourSwarm and check in somewhere, then look at your dashboard.</p>
@@ -59,9 +66,11 @@ Authorization: Bearer xxxxxxxxxxxxxxxxxxxxxxx</code></pre>
 
 <h4>photo</h4>
 
-<p>If your checkin includes one or more photos, then the URL to your photos will be in the <code>photo</code> property.</p>
+<p>If your checkin includes one or more photos, then the URL to your photos will be in the <code>photo</code> property. In "simple" mode, the photos will be uploaded to your endpoint directly instead of referenced by URL. You can access the photo by looking for an uploaded file named "photo".</p>
 
 <p>Note that photos are sent from the Swarm app asynchronously, so it's actually possible for your checkin to be created before the photo has been uploaded to the server, such as when you're on a slow network connection. If this happens, the checkin posted to your website will not include a photo initially. See the <a href="#updates">Updates</a> section below for a description of how to handle receiving the photo after the initial checkin has been created.</p>
+
+<p>In "simple" mode, OwnYourSwarm will still send update requests in JSON format.</p>
 
 <h4>content</h4>
 
@@ -82,6 +91,10 @@ Authorization: Bearer xxxxxxxxxxxxxxxxxxxxxxx</code></pre>
 <b>Plaintext Content</b>
 
 <pre>  "content": ["Checkin shout"]</pre>
+
+<b>Simple Mode</b>
+
+<p>In "simple" mode, OwnYourSwarm will include "Checked in at {venue name}" to the content. This means if you are able to post notes from Micropub clients, you can very likely support posting checkins from OwnYourSwarm without any additional work!</p>
 
 <h4>category</h4>
 
@@ -138,6 +151,10 @@ Present when available from Swarm:
 </ul>
 
 <p>Read more about the <a href="https://www.w3.org/TR/micropub/#json-syntax">Micropub JSON syntax</a>.</p>
+
+<b>Simple Mode</b>
+
+<p>In "simple" mode, the checkin property will be only the Foursquare venue URL. You can use the presence of this property to detect that this is a checkin, and you can add a link to the venue.</p>
 
 </section>
 
