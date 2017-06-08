@@ -3,8 +3,7 @@
 class ProcessCheckin {
 
   public static $tiers = [
-    # 1,2,3,5,10,15
-    1,15,30,60,120,300,600,1800,3600
+    1,15,30,60,120,300,600,1800,3600,14400
   ];
 
   public static function nextTier($tier) {
@@ -190,12 +189,12 @@ class ProcessCheckin {
     }
 
     // If there was no photo, queue another polling task to check for the photo later
-    if(!$is_import && $canonical_url && $num_photos == 0) {
+    if(!$is_import && $canonical_url) {
       $next = self::scheduleNext($checkin);
       if($next) {
-        echo "No photo found. Scheduling another check in $next seconds\n";
+        echo "Scheduling another check in $next seconds\n";
       } else {
-        echo "No photo found. Reached max poll interval, giving up.\n";
+        echo "Reached max poll interval, giving up.\n";
       }
     } else {
       $checkin->poll_interval = 0;
