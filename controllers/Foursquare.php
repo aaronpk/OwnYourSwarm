@@ -86,9 +86,10 @@ class Foursquare extends Controller {
         $this->user->foursquare_url = $info['response']['user']['canonicalUrl'];
 
         // Remove this foursquare user from other accounts
-        ORM::for_table('users')->raw_execute('
-          UPDATE users set foursquare_user_id="", foursquare_url=""
-          WHERE foursquare_user_id=:u', ['u'=>$info['response']['user']['id']]);
+        // 2017-08-19 allowing foursquare accounts to be connected to multiple micropub accounts
+        // ORM::for_table('users')->raw_execute('
+        //   UPDATE users set foursquare_user_id="", foursquare_url=""
+        //   WHERE foursquare_user_id=:u', ['u'=>$info['response']['user']['id']]);
       }
 
       $this->user->save();
@@ -110,10 +111,10 @@ class Foursquare extends Controller {
     $payload = $request->get('checkin');
 
     $data = json_decode($payload, true);
-    $user_id = $data['user']['id'];
+    $foursquare_user_id = $data['user']['id'];
 
-    $user = ORM::for_table('users')->where('foursquare_user_id', $user_id)->find_one();
-    if($user) {
+    $users = ORM::for_table('users')->where('foursquare_user_id', $foursquare_user_id)->find_many();
+    foreach($users as $user) {
       $user->last_checkin_payload = $payload;
       $user->save();
 
