@@ -53,6 +53,14 @@ class ProcessCheckin {
     return $info;
   }
 
+  private static function _addSyndicateTo(&$entry, $syndicateTo) {
+    if(isset($entry['properties']['syndicate-to'])) {
+      $entry['properties']['syndicate-to'][] = $syndicateTo;
+    } else {
+      $entry['properties']['syndicate-to'] = [$syndicateTo];
+    }
+  }
+
   public static function run($user_id, $checkin_id, $is_import=false) {
     $user = ORM::for_table('users')->find_one($user_id);
     if(!$user) {
@@ -103,6 +111,36 @@ class ProcessCheckin {
       $checkin->mf2_data = json_encode($entry, JSON_UNESCAPED_SLASHES);
       $checkin->save();
 
+      $rules = ORM::for_table('syndication_rules')
+        ->where('user_id', $user->id)
+        ->find_many();
+      foreach($rules as $rule) {
+        echo "Checking rule $rule->id\n";
+        switch($rule->type) {
+          case 'keyword': 
+            if(isset($entry['properties']['content'])) {
+              $content = $entry['properties']['content'][0];
+              if(is_array($content))
+                $content = $content['text'];
+              if(stripos($content, $rule->match) !== false) {
+                self::_addSyndicateTo($entry, $rule->syndicate_to);
+              }
+            }
+            break;
+          case 'photo': 
+            if(isset($entry['properties']['photo'])) {
+              self::_addSyndicateTo($entry, $rule->syndicate_to);
+            }
+            break;
+          case 'shout':
+            if(isset($entry['properties']['content'])) {
+              self::_addSyndicateTo($entry, $rule->syndicate_to);
+            }
+            break;
+        }
+      }
+
+
       list($params, $content_type) = self::buildPOSTPayload($user, $entry);
 
       $micropub_response = micropub_post($user, $params, $content_type);
@@ -127,6 +165,7 @@ class ProcessCheckin {
         $user->save();
       } else {
         echo "Micropub post failed\n";
+        echo $micropub_response['response']."\n";
         $user->micropub_failures++;
         $user->save();
       }
@@ -135,10 +174,11 @@ class ProcessCheckin {
       $checkin->save();
 
       if($canonical_url) {
-        self::scheduleWebmentionJobForCoins($checkin);
+        #self::scheduleWebmentionJobForCoins($checkin);
       }
     } else {
       // Updated checkin (a photo was added)
+      // TODO: if a user is checked in by someone else, and then they check themselves in with a shout, the shout will be new information needing to be sent as well
       $canonical_url = $checkin->canonical_url;
 
       $existing_photos = json_decode($checkin->photos, true);
@@ -315,17 +355,6 @@ class ProcessCheckin {
 
       if($checkin['entities']) {
         $html = self::replaceLinkedEntities($html, $checkin['entities']);
-        // Replace from right to left so the offsets aren't messed up
-        // foreach(array_reverse($checkin['entities']) as $entity) {
-        //   if($entity['type'] == 'user') {
-        //     $new_html = mb_substr($html, 0, $entity['indices'][0])
-        //       . '<a href="' . url_for_user($entity['id']) . '">'
-        //       . mb_substr($html, $entity['indices'][0], $entity['indices'][1]-$entity['indices'][0])
-        //       . '</a>'
-        //       . mb_substr($html, $entity['indices'][1]);
-        //     $html = $new_html;
-        //   }
-        // }
       }
 
       if($text == $html) {

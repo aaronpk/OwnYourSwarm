@@ -28,9 +28,17 @@ class Main extends Controller {
     if(!$this->currentUser($response))
       return $response;
 
+    $rules = ORM::for_table('syndication_rules')
+      ->where('user_id', $this->user->id)
+      ->order_by_asc('syndicate_to_name')
+      ->order_by_asc('type')
+      ->order_by_asc('match')
+      ->find_many();
+
     $response->setContent(view('dashboard', [
       'title' => 'OwnYourSwarm',
       'user' => $this->user,
+      'rules' => $rules,
     ]));
     return $response;
   }
@@ -73,7 +81,7 @@ class Main extends Controller {
       return $response;
 
     $info = ProcessCheckin::getFoursquareCheckins($this->user, [
-      'limit' => 10,
+      'limit' => 30,
       'sort' => 'newestfirst'
     ]);
 
@@ -154,7 +162,8 @@ class Main extends Controller {
     $response->headers->set('Content-Type', 'application/json');
     $response->setContent(json_encode([
       'swarm' => json_encode($swarm, JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES),
-      'micropub' => $micropub
+      'micropub' => $micropub,
+      'token' => $this->user->foursquare_access_token
     ]));
     return $response;
   }
@@ -194,6 +203,85 @@ class Main extends Controller {
 
     $response->headers->set('Content-Type', 'application/json');
     $response->setContent(json_encode(['result'=>'deleted']));
+    return $response;
+  }
+
+  public function get_syndication_targets(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    $targets = json_decode($this->user->micropub_syndication_targets);
+
+    $response->headers->set('Content-Type', 'application/json');
+    $response->setContent(json_encode(['targets'=>$targets]));
+    return $response;
+  }
+
+  public function reload_syndication_targets(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    $r = micropub_get($this->user, ['q'=>'syndicate-to']);
+
+    $targets = [];
+    $error = false;
+
+    if($r['data']) {
+      if(array_key_exists('syndicate-to', $r['data'])) {
+        $raw = $r['data']['syndicate-to'];
+
+        foreach($raw as $t) {
+          if(array_key_exists('name', $t) && array_key_exists('uid', $t)) {
+            $targets[] = $t;
+          }
+        }
+
+        $this->user->micropub_syndication_targets = json_encode($targets);
+        $this->user->save();
+      } else {
+        $error = 'Your endpoint did not return a "syndicate-to" property in the response';
+      }
+    } else {
+      $error = $r['error'];
+    }
+
+    $response->headers->set('Content-Type', 'application/json');
+    $response->setContent(json_encode([
+      'targets' => $targets,
+      'error' => $error
+    ]));
+    return $response;
+  }
+
+  public function post_syndication_rules(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    switch($request->get('action')) {
+      case 'create': 
+        
+        $rule = ORM::for_table('syndication_rules')->create();
+        $rule->user_id = $this->user->id;
+        $rule->type = $request->get('type');
+        $rule->match = $request->get('keyword');
+        $rule->syndicate_to = $request->get('target');
+        $rule->syndicate_to_name = $request->get('target_name');
+        $rule->save();
+
+        break;
+      case 'delete':
+        $rule = ORM::for_table('syndication_rules')
+          ->where('user_id', $this->user->id)
+          ->where('id', $request->get('id'))
+          ->delete_many();
+        
+        break;
+    }
+
+    $response->headers->set('Content-Type', 'application/json');
+    $response->setContent(json_encode([
+      'result' => 'ok'
+    ]));
     return $response;
   }
 

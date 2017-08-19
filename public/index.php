@@ -21,6 +21,9 @@ $router->addRoute('POST', '/checkin/import.json', 'Controllers\\Main::import_che
 $router->addRoute('POST', '/checkin/reset.json', 'Controllers\\Main::reset_checkin');
 $router->addRoute('GET', '/checkin/recent.json', 'Controllers\\Main::get_recent_checkins');
 $router->addRoute('POST', '/user/prefs.json', 'Controllers\\Main::save_user_preferences');
+$router->addRoute('GET', '/user/syndication-targets.json', 'Controllers\\Main::get_syndication_targets');
+$router->addRoute('POST', '/user/syndication-targets.json', 'Controllers\\Main::reload_syndication_targets');
+$router->addRoute('POST', '/user/syndication-rules.json', 'Controllers\\Main::post_syndication_rules');
 
 $router->addRoute('GET', '/checkin/{checkin}/{hash}', 'Controllers\\Foursquare::comment');
 

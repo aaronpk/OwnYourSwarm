@@ -66,6 +66,37 @@ function k($a, $k, $default=null) {
   }
 }
 
+function micropub_get($user, $params) {
+  $endpoint = $user->micropub_endpoint;
+  
+  $url = parse_url($endpoint);
+  if(!k($url, 'query')) {
+    $url['query'] = http_build_query($params);
+  } else {
+    $url['query'] .= '&' . http_build_query($params);
+  }
+  $endpoint = build_url($url);
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $endpoint);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    'Authorization: Bearer ' . $user->micropub_access_token,
+    'Accept: application/json'
+  ));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $response = curl_exec($ch);
+  $data = array();
+  if($response) {
+    $data = json_decode($response, true);
+  }
+  $error = curl_error($ch);
+  return array(
+    'data' => $data,
+    'error' => $error,
+    'curlinfo' => curl_getinfo($ch)
+  );
+}
+
 function micropub_post($user, $params, $content_type='json') {
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $user->micropub_endpoint);
