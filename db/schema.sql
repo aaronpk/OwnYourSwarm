@@ -31,6 +31,7 @@ CREATE TABLE `checkins` (
   `published` datetime DEFAULT NULL,
   `canonical_url` varchar(255) DEFAULT NULL,
   `photos` text,
+  `shout` text,
   `foursquare_data` text,
   `mf2_data` text,
   `success` tinyint(4) NOT NULL DEFAULT '0',
@@ -64,3 +65,13 @@ CREATE TABLE `webmentions` (
   PRIMARY KEY (`id`),
   KEY `checkin_url` (`foursquare_checkin`,`hash`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `syndication_rules` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `type` varchar(255) DEFAULT NULL,
+  `match` varchar(255) DEFAULT NULL,
+  `syndicate_to` text,
+  `syndicate_to_name` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -30,9 +30,9 @@ class ProcessCheckin {
     return $next;
   }
 
-  public static function scheduleWebmentionJobForCoins(&$checkin) {
+  public static function scheduleWebmentionJobForCoins(&$checkin, $delay=5) {
     q()->queue('ProcessCheckin', 'sendCoins', [$checkin->id], [
-      'delay' => 5
+      'delay' => $delay
     ]);
   }
 
@@ -140,7 +140,6 @@ class ProcessCheckin {
         }
       }
 
-
       list($params, $content_type) = self::buildPOSTPayload($user, $entry);
 
       $micropub_response = micropub_post($user, $params, $content_type);
@@ -174,7 +173,7 @@ class ProcessCheckin {
       $checkin->save();
 
       if($canonical_url) {
-        #self::scheduleWebmentionJobForCoins($checkin);
+        self::scheduleWebmentionJobForCoins($checkin);
       }
     } else {
       // Updated checkin (a photo was added)
@@ -187,6 +186,11 @@ class ProcessCheckin {
 
       $data = $info['response']['checkin'];
 
+      $updated = false;
+      $add = [];
+      $replace = [];
+
+      // Check for new photos
       $num_photos = 0;
       if(isset($data['photos'])) {
         $num_photos = count($data['photos']['items']);
@@ -199,36 +203,49 @@ class ProcessCheckin {
         echo "Found ".count($new_photos)." new photos\n";
 
         if(count($new_photos)) {
-          $update = [
-            'action' => 'update',
-            'url' => $canonical_url,
-            'add' => [
-              'photo' => $new_photos
-            ]
-          ];
-          $micropub_response = micropub_post($user, json_encode($update));
-          if(in_array($micropub_response['code'],[200,201,202,204])) {
-            echo "Update of ".$canonical_url." was successful\n";
-
-            $user->micropub_update_success = 1;
-            $user->save();
-          } else {
-            echo "Failed to update checkin\n";
-            echo $micropub_response['response']."\n";
-          }
+          $add['photo'] = $new_photos;
+          $updated = true;
         }
 
         $checkin->photos = json_encode($photos, JSON_UNESCAPED_SLASHES);
         $checkin->num_photos = $num_photos;
         $checkin->save();
+      }
 
-        if(count($new_photos)) {
-          self::scheduleWebmentionJobForCoins($checkin);
+      // Check if a shout was added
+      // Only for checkins imported after launching this code since the DB "shout" column is blank for old checkins
+      if(!$checkin->shout && !empty($data['shout'])) {
+        $replace['content'] = self::_buildHEntryContent($data);
+        $updated = true;
+        $checkin->shout = $data['shout'];
+        $checkin->save();
+      }
+
+      if($updated) {
+        $update = [
+          'action' => 'update',
+          'url' => $canonical_url,
+          'add' => $add,
+          'replace' => $replace
+        ];
+        $micropub_response = micropub_post($user, json_encode($update));
+        if(in_array($micropub_response['code'],[200,201,202,204])) {
+          echo "Update of ".$canonical_url." was successful\n";
+
+          $user->micropub_update_success = 1;
+          $user->save();
+        } else {
+          echo "Failed to update checkin\n";
+          echo $micropub_response['response']."\n";
         }
+
+        self::scheduleWebmentionJobForCoins($checkin, 30);
+      } else {
+        echo "No changes found\n";
       }
     }
 
-    // If there was no photo, queue another polling task to check for the photo later
+    // If this was not an import, queue another polling task to check for updates later
     if(!$is_import && $canonical_url) {
       $next = self::scheduleNext($checkin);
       if($next) {
@@ -336,6 +353,25 @@ class ProcessCheckin {
     return $html;
   }
 
+  private static function _buildHEntryContent($checkin) {
+    $text = $checkin['shout'];
+    $html = $checkin['shout'];
+
+    if($checkin['entities']) {
+      $html = self::replaceLinkedEntities($html, $checkin['entities']);
+    }
+
+    if($text == $html) {
+      $content = [$text];
+    } else {
+      $content = [
+        ['value'=>$text, 'html'=>$html]
+      ];
+    }
+
+    return $content;
+  }
+
   public static function checkinToHEntry($checkin, &$user) {
     $date = DateTime::createFromFormat('U', $checkin['createdAt']);
     $tz = offset_to_timezone($checkin['timeZoneOffset'] * 60);
@@ -351,19 +387,8 @@ class ProcessCheckin {
 
     if(!empty($checkin['shout'])) {
       $text = $checkin['shout'];
-      $html = $checkin['shout'];
 
-      if($checkin['entities']) {
-        $html = self::replaceLinkedEntities($html, $checkin['entities']);
-      }
-
-      if($text == $html) {
-        $entry['properties']['content'] = [$text];
-      } else {
-        $entry['properties']['content'] = [
-          ['value'=>$text, 'html'=>$html]
-        ];
-      }
+      $entry['properties']['content'] = self::_buildHEntryContent($checkin);
 
       // Include hashtags
       if(preg_match_all('/\B\#(\p{L}+\b)/u', $text, $matches)) {
