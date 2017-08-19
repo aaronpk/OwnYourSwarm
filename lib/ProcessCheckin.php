@@ -213,7 +213,7 @@ class ProcessCheckin {
 
       // Check if a shout was added
       // Only for checkins imported after launching this code since the DB "shout" column is blank for old checkins
-      if(time() > strtotime($checkin->published)) {
+      if(strtotime($checkin->published) > strtotime('2017-08-19T16:00:00-0700')) {
         if(!$checkin->shout && !empty($data['shout'])) {
           $replace['content'] = self::_buildHEntryContent($data);
           $updated = true;
