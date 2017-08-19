@@ -2,6 +2,7 @@
 ORM::configure('mysql:host=' . Config::$dbHost . ';dbname=' . Config::$dbName);
 ORM::configure('username', Config::$dbUsername);
 ORM::configure('password', Config::$dbPassword);
+ORM::configure('driver_options', [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4']);
 
 function view($template, $data=[]) {
   global $templates;
