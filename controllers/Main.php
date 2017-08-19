@@ -35,10 +35,16 @@ class Main extends Controller {
       ->order_by_asc('match')
       ->find_many();
 
+    $other_accounts = ORM::for_table('users')
+      ->where('foursquare_user_id', $this->user->foursquare_user_id)
+      ->where_not_equal('id', $this->user->id)
+      ->count();
+
     $response->setContent(view('dashboard', [
       'title' => 'OwnYourSwarm',
       'user' => $this->user,
       'rules' => $rules,
+      'other_accounts' => $other_accounts
     ]));
     return $response;
   }
@@ -274,7 +280,7 @@ class Main extends Controller {
           ->where('user_id', $this->user->id)
           ->where('id', $request->get('id'))
           ->delete_many();
-        
+
         break;
     }
 

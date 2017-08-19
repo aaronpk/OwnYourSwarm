@@ -38,6 +38,7 @@ $router->addRoute('GET', '/auth/callback', 'Controllers\\Auth::callback');
 $router->addRoute('GET', '/foursquare', 'Controllers\\Foursquare::index');
 $router->addRoute('GET', '/foursquare/auth', 'Controllers\\Foursquare::auth');
 $router->addRoute('GET', '/foursquare/disconnect', 'Controllers\\Foursquare::disconnect');
+$router->addRoute('GET', '/foursquare/disconnect-other', 'Controllers\\Foursquare::disconnect_other');
 $router->addRoute('GET', '/foursquare/callback', 'Controllers\\Foursquare::callback');
 $router->addRoute('POST', '/foursquare/push', 'Controllers\\Foursquare::push');
 

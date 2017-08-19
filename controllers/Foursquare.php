@@ -47,6 +47,26 @@ class Foursquare extends Controller {
     return $response;
   }
 
+  public function disconnect_other(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    $others = ORM::for_table('users')
+      ->where('foursquare_user_id', $this->user->foursquare_user_id)
+      ->where_not_equal('id', $this->user->id)
+      ->find_many();
+    foreach($others as $other) {
+      $other->foursquare_url = '';
+      $other->foursquare_user_id = '';
+      $other->foursquare_access_token = '';
+      $other->save();
+    }
+
+    $response->headers->set('Location', '/dashboard');
+    $response->setStatusCode(302);
+    return $response;
+  }
+
   public function callback(Request $request, Response $response) {
     if(!$this->currentUser($response))
       return $response;

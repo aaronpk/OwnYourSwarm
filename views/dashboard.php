@@ -123,9 +123,14 @@
 <div class="panel">
   <h3>Foursquare</h3>
 
-  <p>Your account is connected to the Foursquare account <b><?= $user->foursquare_url ?: $user->foursquare_user_id ?></b>.</p>
+  <p>Your OwnYourSwarm account is connected to the Foursquare account <b><?= $user->foursquare_url ?: $user->foursquare_user_id ?></b>.</p>
 
-  <a class="ui tiny yellow button" class="disconnect-foursquare" href="/foursquare/disconnect">Disconnect Foursquare</a>
+  <p><a class="ui tiny yellow button" class="disconnect-foursquare" href="/foursquare/disconnect">Disconnect Foursquare</a></p>
+
+  <?php if($other_accounts > 0): ?>
+    <p>This Foursquare account is connected to <?= $other_accounts ?> other OwnYourSwarm accounts.</p>
+    <a class="ui tiny orange button" class="disconnect-foursquare" href="/foursquare/disconnect-other">Disconnect Other Accounts</a>
+  <?php endif; ?>
 </div>
 
 <br>
