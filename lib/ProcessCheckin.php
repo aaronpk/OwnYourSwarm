@@ -213,11 +213,13 @@ class ProcessCheckin {
 
       // Check if a shout was added
       // Only for checkins imported after launching this code since the DB "shout" column is blank for old checkins
-      if(!$checkin->shout && !empty($data['shout'])) {
-        $replace['content'] = self::_buildHEntryContent($data);
-        $updated = true;
-        $checkin->shout = $data['shout'];
-        $checkin->save();
+      if(time() > strtotime($checkin->published)) {
+        if(!$checkin->shout && !empty($data['shout'])) {
+          $replace['content'] = self::_buildHEntryContent($data);
+          $updated = true;
+          $checkin->shout = $data['shout'];
+          $checkin->save();
+        }
       }
 
       // Check syndication rules again to see if any changes matched some rules
