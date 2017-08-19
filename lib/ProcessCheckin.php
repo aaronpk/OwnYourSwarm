@@ -53,11 +53,11 @@ class ProcessCheckin {
     return $info;
   }
 
-  private static function _addSyndicateTo(&$entry, $syndicateTo) {
-    if(isset($entry['properties']['syndicate-to'])) {
-      $entry['properties']['syndicate-to'][] = $syndicateTo;
+  private static function _addSyndicateTo(&$properties, $syndicateTo) {
+    if(isset($properties['syndicate-to'])) {
+      $properties['syndicate-to'][] = $syndicateTo;
     } else {
-      $entry['properties']['syndicate-to'] = [$syndicateTo];
+      $properties['syndicate-to'] = [$syndicateTo];
     }
   }
 
@@ -115,7 +115,6 @@ class ProcessCheckin {
         ->where('user_id', $user->id)
         ->find_many();
       foreach($rules as $rule) {
-        echo "Checking rule $rule->id\n";
         switch($rule->type) {
           case 'keyword': 
             if(isset($entry['properties']['content'])) {
@@ -123,18 +122,18 @@ class ProcessCheckin {
               if(is_array($content))
                 $content = $content['text'];
               if(stripos($content, $rule->match) !== false) {
-                self::_addSyndicateTo($entry, $rule->syndicate_to);
+                self::_addSyndicateTo($entry['properties'], $rule->syndicate_to);
               }
             }
             break;
           case 'photo': 
             if(isset($entry['properties']['photo'])) {
-              self::_addSyndicateTo($entry, $rule->syndicate_to);
+              self::_addSyndicateTo($entry['properties'], $rule->syndicate_to);
             }
             break;
           case 'shout':
             if(isset($entry['properties']['content'])) {
-              self::_addSyndicateTo($entry, $rule->syndicate_to);
+              self::_addSyndicateTo($entry['properties'], $rule->syndicate_to);
             }
             break;
         }
@@ -221,6 +220,35 @@ class ProcessCheckin {
         $checkin->save();
       }
 
+      // Check syndication rules again to see if any changes matched some rules
+      $rules = ORM::for_table('syndication_rules')
+        ->where('user_id', $user->id)
+        ->find_many();
+      foreach($rules as $rule) {
+        switch($rule->type) {
+          case 'keyword': 
+            // Only check this if there was previously no shout
+            if(isset($replace['content'])) {
+              if(stripos($data['shout'], $rule->match) !== false) {
+                self::_addSyndicateTo($add, $rule->syndicate_to);
+              }
+            }
+            break;
+          case 'photo':
+            // If the checkin previously did not have any photos but does now, add this syndication
+            if(isset($add['photo'])) {
+              self::_addSyndicateTo($add, $rule->syndicate_to);
+            }
+            break;
+          case 'shout':
+            // Only trigger this if there was previously no shout
+            if(isset($replace['content'])) {
+              self::_addSyndicateTo($add, $rule->syndicate_to);
+            }
+            break;
+        }
+      }
+
       if($updated) {
         $update = [
           'action' => 'update',
@@ -230,6 +258,7 @@ class ProcessCheckin {
         ];
         $micropub_response = micropub_post($user, json_encode($update));
         if(in_array($micropub_response['code'],[200,201,202,204])) {
+          print_r($update);
           echo "Update of ".$canonical_url." was successful\n";
 
           $user->micropub_update_success = 1;
