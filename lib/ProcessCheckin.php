@@ -120,7 +120,7 @@ class ProcessCheckin {
             if(isset($entry['properties']['content'])) {
               $content = $entry['properties']['content'][0];
               if(is_array($content))
-                $content = $content['text'];
+                $content = $content['value'];
               if(stripos($content, $rule->match) !== false) {
                 self::_addSyndicateTo($entry['properties'], $rule->syndicate_to);
               }
