@@ -457,19 +457,8 @@ class ProcessCheckin {
 
       foreach($checkin['with'] as $with) {
         // Check our users table to find the person's website if they use OwnYourSwarm
-        $person_urls = ['https://foursquare.com/user/'.$with['id']];
-        $person = ORM::for_table('users')->where('foursquare_user_id', $with['id'])->find_one();
-        if($person) {
-          array_unshift($person_urls, $person->url); // canonical URL is first in the list
-        }
-        $entry['properties']['category'][] = [
-          'type' => ['h-card'],
-          'properties' => [
-            'url' => $person_urls,
-            'name' => [$with['firstName']],
-            'photo' => [$with['photo']['prefix'].'300x300'.$with['photo']['suffix']]
-          ]
-        ];
+        $withHCard = self::foursquareUserToHCard($with);
+        $entry['properties']['category'][] = $withHCard;
       }
     }
 
@@ -478,7 +467,8 @@ class ProcessCheckin {
       'properties' => [
         'name' => [$venue['name']],
         'url' => ['https://foursquare.com/v/'.$venue['id']],
-      ]
+      ],
+      'value' => $venue['name']
     ];
 
     if(isset($venue['url']) && $venue['url']) {
@@ -528,7 +518,32 @@ class ProcessCheckin {
       $entry['properties']['checkin'][] = $event;
     }
 
+    # If someone else checked you in, add that as a new property
+    if(isset($checkin['createdBy']) && $checkin['createdBy']['id'] != $checkin['user']['id']) {
+      $entry['properties']['checked-in-by'] = [self::foursquareUserToHCard($checkin['createdBy'])];
+    }
+
     return $entry;
+  }
+
+  public static function foursquareUserToHCard($user) {
+    $person_urls = ['https://foursquare.com/user/'.$user['id']];
+    $person = ORM::for_table('users')->where('foursquare_user_id', $user['id'])
+      ->order_by_desc('last_login')
+      ->find_one();
+    if($person) {
+      // put canonical URL first in the list
+      array_unshift($person_urls, $person->url); 
+    }
+    return [
+      'type' => ['h-card'],
+      'properties' => [
+        'url' => $person_urls,
+        'name' => [$user['firstName']],
+        'photo' => [$user['photo']['prefix'].'300x300'.$user['photo']['suffix']]
+      ],
+      'value' => $person_urls[0]
+    ];
   }
 
   public static function jsonToFormEncoded($json) {
@@ -557,6 +572,8 @@ class ProcessCheckin {
 
     if(!isset($params['content']))
       $params['content'] = '';
+
+    unset($params['checked-in-by']);
 
     // Include event info in the content
     $params['content'] = 'Checked in at '.$json['properties']['checkin'][0]['properties']['name'][0] 
