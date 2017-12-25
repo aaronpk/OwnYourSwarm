@@ -54,7 +54,7 @@ class Main extends Controller {
       return $response;
 
     if($this->user->last_checkin_payload) {
-      $hentry = ProcessCheckin::checkinToHEntry(json_decode($this->user->last_checkin_payload, true), $user);
+      $hentry = ProcessCheckin::checkinToHEntry(json_decode($this->user->last_checkin_payload, true), $this->user);
       list($hentry, $content_type) = ProcessCheckin::buildPOSTPayload($this->user, $hentry, true);
     } else {
       $hentry = false;
@@ -116,7 +116,7 @@ class Main extends Controller {
     if(!$this->currentUser($response))
       return $response;
 
-    $hentry = ProcessCheckin::checkinToHEntry(json_decode($this->user->last_checkin_payload, true), $user);
+    $hentry = ProcessCheckin::checkinToHEntry(json_decode($this->user->last_checkin_payload, true), $this->user);
 
     list($params, $content_type) = ProcessCheckin::buildPOSTPayload($this->user, $hentry);
 
@@ -161,7 +161,7 @@ class Main extends Controller {
       $micropub = false;
     } else {
       $swarm = $swarm['response']['checkin'];
-      $hentry = ProcessCheckin::checkinToHEntry($swarm, $user);
+      $hentry = ProcessCheckin::checkinToHEntry($swarm, $this->user);
       list($micropub, $content_type) = ProcessCheckin::buildPOSTPayload($this->user, $hentry, true);
     }
 
