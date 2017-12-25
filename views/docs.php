@@ -154,7 +154,7 @@ Present when available from Swarm:
 
 <p>In "simple" mode, the checkin property will be only the Foursquare venue URL. You can use the presence of this property to detect that this is a checkin, and you can add a link to the venue.</p>
 
-<h4>checked-in-by</h4>
+<h4 id="checked-in-by">checked-in-by</h4>
 
 <p>If a friend checked you in, then an additional property will be included to indicate who created the checkin on your behalf. This is an <code>h-card</code> in the same format as the <a href="#person-tag">person tags</a>. This is only sent for JSON Micropub requests.</p>
 
