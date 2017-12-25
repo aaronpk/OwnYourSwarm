@@ -215,7 +215,7 @@ class ProcessCheckin {
       // Only for checkins imported after launching this code since the DB "shout" column is blank for old checkins
       if(strtotime($checkin->published) > strtotime('2017-08-19T16:00:00-0700')) {
         if(!$checkin->shout && !empty($data['shout'])) {
-          $replace['content'] = self::_buildHEntryContent($data);
+          $replace['content'] = self::_buildHEntryContent($data, true);
           $updated = true;
           $checkin->shout = $data['shout'];
           $checkin->save();
@@ -384,11 +384,22 @@ class ProcessCheckin {
     return $html;
   }
 
-  private static function _buildHEntryContent($checkin) {
+  private static function _buildHEntryContent($checkin, $json=true) {
     $text = $checkin['shout'];
-    $html = $checkin['shout'];
 
-    if($checkin['entities']) {
+    if($json && isset($checkin['with'])) {
+      // Remove "with X" if that is the only text in the shout
+      $withStr = 'with ';
+      foreach($checkin['with'] as $i=>$with) {
+        $withStr .= ($i == 0 ? $with['firstName'] : ', '.$with['firstName']);
+      }
+      if(trim($text) == trim($withStr)) {
+        $text = '';
+      }
+    }
+
+    $html = $text;
+    if($text && $checkin['entities']) {
       $html = self::replaceLinkedEntities($html, $checkin['entities']);
     }
 
@@ -404,6 +415,8 @@ class ProcessCheckin {
   }
 
   public static function checkinToHEntry($checkin, &$user) {
+    $json = $user->micropub_style == 'json';
+
     $date = DateTime::createFromFormat('U', $checkin['createdAt']);
     $tz = offset_to_timezone($checkin['timeZoneOffset'] * 60);
     $date->setTimeZone($tz);
@@ -419,7 +432,7 @@ class ProcessCheckin {
     if(!empty($checkin['shout'])) {
       $text = $checkin['shout'];
 
-      $entry['properties']['content'] = self::_buildHEntryContent($checkin);
+      $entry['properties']['content'] = self::_buildHEntryContent($checkin, $json);
 
       // Include hashtags
       if(preg_match_all('/\B\#(\p{L}+\b)/u', $text, $matches)) {
