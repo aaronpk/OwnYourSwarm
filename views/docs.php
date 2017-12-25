@@ -62,7 +62,7 @@ content=Checked in to PDX Airport
 
 <h4>syndication</h4>
 
-<p>The <code>syndication</code> property will contain the Swarm permalink to the checkin. Note that the Swarm permalinks sent in this parameter are not publicly visible, they only visible to your Swarm friends.</p>
+<p>The <code>syndication</code> property will contain the Swarm permalink to the checkin. Note that the Swarm permalinks sent in this parameter are not publicly visible, they are only visible to your Swarm friends.</p>
 
 <h4>photo</h4>
 
@@ -74,11 +74,11 @@ content=Checked in to PDX Airport
 
 <h4>content</h4>
 
-<p>If your checkin contains a note, or if you've tagged people in the checkin, then the <code>content</code> property will be included. The <code>content</code>  property will be either a plain string, or an object containing both a plaintext and HTML version of the text, depending on whether there is any HTML formatting in the text.</p>
+<p>If your checkin contains a user-entered note, then the <code>content</code> property will be included. The <code>content</code>  property will be either a plain string, or an object containing both a plaintext and HTML version of the text, depending on whether there is any HTML formatting in the text.</p>
 
-<p>If you tag people in the checkin, their names will be hyperlinked to their Foursquare profile URLs. (If they also use OwnYourSwarm, then their personal URL will be used instead.)</p>
+<p>If you tag people in the checkin, then "with X, Y, Z" will be added to the note, just like it appears in Swarm. The users' names will be hyperlinked to their Foursquare profile URLs. If they also use OwnYourSwarm, then their personal URL will also be included.</p>
 
-<p>Note that when you tag people in a checkin, Swarm adds the text "with X, Y, Z" to the end of the text automatically.</p>
+<p>Note that if you don't include any user-entered text, then OwnYourSwarm will not include the "with X, Y, Z" text in the content in JSON mode, but will include it in simple mode.</p>
 
 <b>Content with HTML</b>
 
@@ -109,7 +109,7 @@ content=Checked in to PDX Airport
     "indiewebcamp"
   ]</pre>
 
-<p>If you tag one or more people in the checkin, then their information will be included as a <a href="https://indieweb.org/person-tag">person tag</a> like the below.</p>
+<p id="person-tag">If you tag one or more people in the checkin, then their information will be included as a <a href="https://indieweb.org/person-tag">person tag</a> like the below.</p>
 
 <pre>  "content": [{
     "value": "#indiewebcamp day 1 - with Aaron",
@@ -121,7 +121,7 @@ content=Checked in to PDX Airport
       "type": ["h-card"],
       "properties": {
         "name": ["Aaron"],
-        "url": ["https://foursquare.com/user/59164", "https://aaronparecki.com/"],
+        "url": ["https://aaronparecki.com/","https://foursquare.com/user/59164"],
         "photo": ["https://igx.4sqi.net/img/user/300x300/QREPPTELDVOJ5CE5.jpg"]
       }
     }
@@ -150,11 +150,27 @@ Present when available from Swarm:
   <li><code>tel</code> - The venue's phone number</li>
 </ul>
 
-<p>Read more about the <a href="https://www.w3.org/TR/micropub/#json-syntax">Micropub JSON syntax</a>.</p>
-
 <b>Simple Mode</b>
 
 <p>In "simple" mode, the checkin property will be only the Foursquare venue URL. You can use the presence of this property to detect that this is a checkin, and you can add a link to the venue.</p>
+
+<h4>checked-in-by</h4>
+
+<p>If a friend checked you in, then an additional property will be included to indicate who created the checkin on your behalf. This is an <code>h-card</code> in the same format as the <a href="#person-tag">person tags</a>. This is only sent for JSON Micropub requests.</p>
+
+<pre>  "checked-in-by": [
+    {
+      "type": ["h-card"],
+      "properties": {
+        "name": ["Aaron"],
+        "url": ["https://aaronparecki.com/","https://foursquare.com/user/59164"],
+        "photo": ["https://igx.4sqi.net/img/user/300x300/QREPPTELDVOJ5CE5.jpg"]
+      }
+    }
+  ]
+</pre>
+
+<p>Read more about the <a href="https://www.w3.org/TR/micropub/#json-syntax">Micropub JSON syntax</a>.</p>
 
 </section>
 
@@ -176,7 +192,7 @@ Present when available from Swarm:
 }
 </pre>
 
-<p>There may be one or more URLs in the <code>photo</code> property. Once a photo is found, OwnYourSwarm will stop polling the checkin.</p>
+<p>There may be one or more URLs in the <code>photo</code> property. OwnYourSwarm will continue polling your checkin for some time, as photos may appear in the checkin individually, and you can actually continue to add photos to the checkin in Swarm well after the initial checkin was created.</p>
 
 </section>
 
