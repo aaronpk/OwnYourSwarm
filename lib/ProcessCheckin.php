@@ -434,6 +434,10 @@ class ProcessCheckin {
 
       $entry['properties']['content'] = self::_buildHEntryContent($checkin, $json);
 
+      if($entry['properties']['content'] == ['']) {
+        unset($entry['properties']['content']);
+      }
+
       // Include hashtags
       if(preg_match_all('/\B\#(\p{L}+\b)/u', $text, $matches)) {
         $entry['properties']['category'] = $matches[1];
@@ -570,10 +574,10 @@ class ProcessCheckin {
       $event = false;
     }
 
+    unset($params['checked-in-by']);
+
     if(!isset($params['content']))
       $params['content'] = '';
-
-    unset($params['checked-in-by']);
 
     // Include event info in the content
     $params['content'] = 'Checked in at '.$json['properties']['checkin'][0]['properties']['name'][0] 
