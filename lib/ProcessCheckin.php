@@ -471,9 +471,9 @@ class ProcessCheckin {
       'properties' => [
         'name' => [$venue['name']],
         'url' => ['https://foursquare.com/v/'.$venue['id']],
-      ],
-      'value' => $venue['name']
+      ]
     ];
+    $hcard['value'] = $hcard['properties']['url'][0];
 
     if(isset($venue['url']) && $venue['url']) {
       $hcard['properties']['url'][] = $venue['url'];
@@ -506,6 +506,17 @@ class ProcessCheckin {
     }
 
     $entry['properties']['checkin'] = [$hcard];
+
+    # Include a location property with h-adr with everything except venue information
+    if(isset($hcard['properties']['latitude'])) {
+      $hadr = $hcard;
+      $hadr['type'] = ['h-adr'];
+      unset($hadr['properties']['name']);
+      unset($hadr['properties']['url']);
+      unset($hadr['properties']['tel']);
+      unset($hadr['value']);
+      $entry['properties']['location'] = [$hadr];
+    }
 
     # Add the event the user checked in to.
     # For now, this is only for the plaintext fallback mode, until we standardize around
@@ -587,6 +598,8 @@ class ProcessCheckin {
     // Add a Geo URI with the location
     if(isset($json['properties']['checkin'][0]['properties']['latitude'])) {
       $params['location'] = 'geo:'.$json['properties']['checkin'][0]['properties']['latitude'][0].','.$json['properties']['checkin'][0]['properties']['longitude'][0];
+    } else {
+      unset($params['location']);
     }
 
     return $params;
