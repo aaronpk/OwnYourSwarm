@@ -202,7 +202,7 @@ class ProcessCheckin {
         echo "Found ".count($new_photos)." new photos\n";
 
         if(count($new_photos)) {
-          $add['photo'] = $new_photos;
+          $add['photo'] = array_values($new_photos);
           $updated = true;
         }
 
