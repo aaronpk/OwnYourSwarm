@@ -16,7 +16,7 @@
           <span class="author-icon large">
             <img src="<?= $comment->author_photo ?>" class="u-photo hexatar" width="60">
           </span>
-          <a href="<?= $comment->author_url ?: 'https://swarmapp.com/' ?>" class="u-url">
+          <a href="<?= $comment->author_url ?: 'https://swarmapp.com/' ?>" class="u-url p-name">
             <?= $comment->author_name ?>
           </a>
         </div>
