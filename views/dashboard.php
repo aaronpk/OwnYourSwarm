@@ -59,6 +59,14 @@
           <label>Include "off the grid" checkins</label>
         </div>
       </div>
+      <div class="field">
+        <div class="ui toggle checkbox">
+          <input type="checkbox" <?= $user->mark_all_private == '1' ? 'checked="checked"' : '' ?>class="hidden" name="mark_all_private">
+          <label>Mark all checkins as private</label>
+        </div>
+      </div>
+
+      <p>Note: These settings require support for private posts on your website. See the documentation on <a href="/docs#visibility">visibility</a> for more information.</p>
 
     </div>
   </div>
@@ -216,10 +224,12 @@ $(function(){
   });
 
   $("#private_checkins .checkbox").click(function(e){
-    var val = $("#private_checkins").form('get value', 'include_private_checkins');
-    $.post('/user/prefs.json', {
-      include_private_checkins: (val == "on" ? 1 : 0)
-    }, function(){
+    var name = $($(this).children('input')[0]).attr('name');
+    var val = $("#private_checkins").form('get value', name);
+    var params = {};
+    params[name] = (val == "on" ? 1 : 0);
+
+    $.post('/user/prefs.json', params, function(){
     });
   });
 

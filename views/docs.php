@@ -174,7 +174,11 @@ Present when available from Swarm:
 
 <h4 id="visibility">visibility</h4>
 
-<p>On the dashboard, you can disable sending "off the grid" checkins entirely. If you enable sending off the grid checkins, then the checkin will include a new property <code>visibility=private</code>. Note that it is up to your Micropub endpoint to recognize this property and handle hiding it from view.</p>
+<p>On the dashboard, you can disable sending "off the grid" checkins entirely. If you enable sending off the grid checkins, then the checkin will include a new property <code>visibility=private</code>.</p>
+
+<p>You can also tell OwnYourSwarm to always mark checkins as private posts, in which case the <code>visibility</code> property will always be set to <code>private</code> for every checkin. You can use this feature if you'd like your checkins on your website but don't want them to be public posts.</p>
+
+<p>Note that these features require that your website supports private posts. It is up to your Micropub endpoint to recognize this property and handle hiding it from not-logged-in users.</p>
 
 </section>
 

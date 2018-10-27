@@ -468,7 +468,7 @@ class ProcessCheckin {
       ]
     ];
 
-    if(isset($checkin['private']) && $checkin['private']) {
+    if((isset($checkin['private']) && $checkin['private']) || $user->mark_all_private) {
       $entry['properties']['visibility'] = ['private'];
     }
 
