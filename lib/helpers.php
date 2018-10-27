@@ -4,6 +4,8 @@ ORM::configure('username', Config::$dbUsername);
 ORM::configure('password', Config::$dbPassword);
 ORM::configure('driver_options', [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4']);
 
+IndieWeb\MentionClient::setUserAgent('OwnYourSwarm Webmention Client ('.Config::$baseURL.')');
+
 class Foursquare {
   public static function userAgent() {
     return Config::$baseURL;

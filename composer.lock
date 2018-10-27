@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "eafca2d5c8ecc78e3536bdfc859b11aa",
+    "content-hash": "21393244a97c59318458b57d1fa0dc13",
     "packages": [
         {
             "name": "barnabywalters/mf-cleaner",
@@ -193,16 +193,16 @@
         },
         {
             "name": "indieweb/mention-client",
-            "version": "1.1.7",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/mention-client-php.git",
-                "reference": "bc45c6051ae9aa5e0905389ad9c863d738be7b03"
+                "reference": "12e3dc4b3f8f9ae82fa7a3953792bea33f59118a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/mention-client-php/zipball/bc45c6051ae9aa5e0905389ad9c863d738be7b03",
-                "reference": "bc45c6051ae9aa5e0905389ad9c863d738be7b03",
+                "url": "https://api.github.com/repos/indieweb/mention-client-php/zipball/12e3dc4b3f8f9ae82fa7a3953792bea33f59118a",
+                "reference": "12e3dc4b3f8f9ae82fa7a3953792bea33f59118a",
                 "shasum": ""
             },
             "require": {
@@ -210,7 +210,7 @@
                 "php": ">=5.4"
             },
             "require-dev": {
-                "phpunit/phpunit": ">=4.8.13"
+                "phpunit/phpunit": "4.8.*"
             },
             "type": "library",
             "autoload": {
@@ -231,7 +231,7 @@
             ],
             "description": "Client library for sending webmention and pingback notifications",
             "homepage": "https://github.com/indieweb/mention-client-php",
-            "time": "2017-04-03T16:21:23+00:00"
+            "time": "2018-10-27T19:41:41+00:00"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -724,7 +724,7 @@
             "keywords": [
                 "beanstalkd"
             ],
-            "time": "2016-09-22 04:57:03"
+            "time": "2016-09-22T04:57:03+00:00"
         },
         {
             "name": "predis/predis",
