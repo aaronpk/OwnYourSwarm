@@ -82,6 +82,13 @@ class Main extends Controller {
       }
     }
 
+    if($request->get('add_tags', null) !== null) {
+      $tags = preg_split('/[, ]+/', $request->get('add_tags'));
+      $tags = array_filter(array_map(function($t){ return trim($t, '# '); }, $tags));
+      $set['add_tags'] = implode(' ', $tags);
+      $this->user->add_tags = implode(' ', $tags);
+    }
+
     $this->user->save();
 
     $response->headers->set('Content-Type', 'application/json');

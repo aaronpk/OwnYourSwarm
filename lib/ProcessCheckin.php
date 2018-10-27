@@ -509,6 +509,14 @@ class ProcessCheckin {
       }
     }
 
+    if($user->add_tags) {
+      $tags = preg_split('/[ ]+/', $user->add_tags);
+      if(!isset($entry['properties']['category']))
+        $entry['properties']['category'] = [];
+
+      $entry['properties']['category'] = array_merge($entry['properties']['category'], $tags);
+    }
+
     $hcard = [
       'type' => ['h-card'],
       'properties' => [

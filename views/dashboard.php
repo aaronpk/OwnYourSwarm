@@ -88,6 +88,23 @@
 
 <br>
 
+<div class="panel">
+  <h3>Add Tags to Posts</h3>
+
+  <p>You can tell OwnYourSwarm to always add a list of tags to your posts when it sends them to your site. You can use this to automatically sort the posts into different categories on your blog, or to easily have a list of all your checkins by adding the tag "checkin". Enter one or more space-separated tags below and they will be included along with the list of hashtags in your checkin.</p>
+
+  <div class="ui form">
+    <div class="field">
+      <label>Tags</label>
+      <textarea id="add_tags" rows="2" placeholder="Space-separated list of tags"><?= htmlspecialchars($user->add_tags) ?></textarea>
+    </div>
+    <button class="ui button" id="save_tags" type="button">Save</button>
+  </div>
+
+</div>
+
+<br>
+
 <div class="panel hidden" id="automatic-syndication">
   <h3>Automatic Syndication</h3>
 
@@ -227,6 +244,16 @@ $(function(){
       window.location.reload();
     });
     return false;
+  });
+
+  $("#save_tags").click(function(){
+    $.post('/user/prefs.json', {
+      add_tags: $("#add_tags").val()
+    }, function(response){
+      if(response.set && response.set.add_tags) {
+        $("#add_tags").val(response.set.add_tags);
+      }
+    });
   });
 
   $("#automatic-syndication .rule").on("mouseover", function(){
