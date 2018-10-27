@@ -13,6 +13,7 @@ CREATE TABLE `users` (
   `micropub_failures` tinyint(4) DEFAULT '0',
   `micropub_update_success` tinyint(4) DEFAULT '0',
   `micropub_style` varchar(255) DEFAULT 'json',
+  `include_private_checkins` tinyint(4) DEFAULT '1',
   `send_responses_swarm` tinyint(4) DEFAULT '1',
   `send_responses_other_users` tinyint(4) DEFAULT '1',
   `date_created` datetime DEFAULT NULL,

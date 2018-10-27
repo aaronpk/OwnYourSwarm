@@ -48,6 +48,21 @@
     </div>
   </div>
 
+  <h4>Off the Grid</h4>
+
+  <div class="ui form">
+    <div class="grouped fields" id="private_checkins">
+
+      <div class="field">
+        <div class="ui toggle checkbox">
+          <input type="checkbox" <?= $user->include_private_checkins == '1' ? 'checked="checked"' : '' ?>class="hidden" name="include_private_checkins">
+          <label>Include "off the grid" checkins</label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <h4>Comments and Responses</h4>
 
   <div class="ui form">
@@ -177,9 +192,17 @@ $(function(){
     var name = $($(this).children('input')[0]).attr('name');
     var val = $("#send_responses_option").form('get value', name);
     var params = {};
-    params[name] = val == "on" ? 1 : 0;
+    params[name] = (val == "on" ? 1 : 0);
 
     $.post('/user/prefs.json', params, function(){
+    });
+  });
+
+  $("#private_checkins .checkbox").click(function(e){
+    var val = $("#private_checkins").form('get value', 'include_private_checkins');
+    $.post('/user/prefs.json', {
+      include_private_checkins: (val == "on" ? 1 : 0)
+    }, function(){
     });
   });
 

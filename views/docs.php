@@ -172,6 +172,10 @@ Present when available from Swarm:
 
 <p>Read more about the <a href="https://www.w3.org/TR/micropub/#json-syntax">Micropub JSON syntax</a>.</p>
 
+<h4 id="visibility">visibility</h4>
+
+<p>On the dashboard, you can disable sending "off the grid" checkins entirely. If you enable sending off the grid checkins, then the checkin will include a new property <code>visibility=private</code>. Note that it is up to your Micropub endpoint to recognize this property and handle hiding it from view.</p>
+
 </section>
 
 <section id="updates">

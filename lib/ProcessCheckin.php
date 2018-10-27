@@ -122,6 +122,15 @@ class ProcessCheckin {
     $checkin->foursquare_data = json_encode($info['response']['checkin'], JSON_UNESCAPED_SLASHES);
     $checkin->save();
 
+    // Check if the user has enabled sending private checkins
+    if(!$user->include_private_checkins && isset($info['response']['checkin']['private']) && $info['response']['checkin']['private']) {
+      // If this is a private checkin, mark not pending and abort
+      $checkin->pending = 0;
+      $checkin->save();
+      echo "Private checkin, skipping\n";
+      return;
+    }
+
     // New checkin
     if(!$checkin->canonical_url) {
       $entry = self::checkinToHEntry($info['response']['checkin'], $user);
@@ -458,6 +467,10 @@ class ProcessCheckin {
         'syndication' => ['https://www.swarmapp.com/user/'.$checkin['user']['id'].'/checkin/'.$checkin['id']],
       ]
     ];
+
+    if(isset($checkin['private']) && $checkin['private']) {
+      $entry['properties']['visibility'] = ['private'];
+    }
 
     if(!empty($checkin['shout'])) {
       $text = $checkin['shout'];
