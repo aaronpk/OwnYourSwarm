@@ -7,12 +7,14 @@ ORM::configure('driver_options', [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf
 class Log {
   private static $fp;
 
-  public static function fsq($user_id, $method, $details=null) {
+  public static function fsq($user_id, $method, $context=null, $details=null) {
     if(!isset(self::$fp)) {
       self::$fp = fopen(__DIR__.'/../scripts/logs/foursquare.log', 'a');
     }
 
     $line = date('Y-m-d H:i:s').' ['.$user_id.'] '.$method;
+    if($context)
+      $line .= ' ('.$context.')';
     if($details)
       $line .= ' '.json_encode($details, JSON_UNESCAPED_SLASHES);
 

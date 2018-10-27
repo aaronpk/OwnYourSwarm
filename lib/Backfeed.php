@@ -44,7 +44,7 @@ class Backfeed {
     echo date('Y-m-d H:i:s') . "\n";
     echo "User: " . $user->url . "\n";
 
-    $info = ProcessCheckin::getFoursquareCheckins($user);
+    $info = ProcessCheckin::getFoursquareCheckins($user, [], 'Backfeed::run');
 
     if(!isset($info['response']['checkins'])) {
       echo "No checkins found\n";
@@ -77,7 +77,7 @@ class Backfeed {
     echo "Checkin: " . $checkin->foursquare_checkin_id . "\n";
     echo $checkin->canonical_url . "\n";
 
-    $info = ProcessCheckin::getFoursquareCheckin($user, $checkin->foursquare_checkin_id);
+    $info = ProcessCheckin::getFoursquareCheckin($user, $checkin->foursquare_checkin_id, 'Backfeed::runForCheckin');
 
     if(!isset($info['response']['checkin'])) {
       echo "Foursquare API returned invalid data for checkin: ".$checkin->foursquare_checkin_id."\n";
@@ -143,7 +143,7 @@ class Backfeed {
   }
 
   public static function processComments(&$user, &$checkin, $data) {
-    $info = ProcessCheckin::getFoursquareCheckin($user, $checkin->foursquare_checkin_id);
+    $info = ProcessCheckin::getFoursquareCheckin($user, $checkin->foursquare_checkin_id, 'processComments');
 
     if(!isset($info['response']['checkin'])) {
       echo "Checkin not found\n";

@@ -89,7 +89,7 @@ class Main extends Controller {
     $info = ProcessCheckin::getFoursquareCheckins($this->user, [
       'limit' => 30,
       'sort' => 'newestfirst'
-    ]);
+    ], 'import::get_recent_checkins');
 
     $checkins = [];
     if(isset($info['response']['checkins']['items']) && count($info['response']['checkins']['items'])) {
@@ -154,7 +154,7 @@ class Main extends Controller {
       $checkin_id = $request->get('checkin');
     }
 
-    $swarm = ProcessCheckin::getFoursquareCheckin($this->user, $checkin_id);
+    $swarm = ProcessCheckin::getFoursquareCheckin($this->user, $checkin_id, 'import::preview');
 
     if(!isset($swarm['response']['checkin'])) {
       $swarm = false;

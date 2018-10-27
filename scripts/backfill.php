@@ -22,7 +22,7 @@ foreach($users as $user) {
   $info = ProcessCheckin::getFoursquareCheckins($user, [
     'limit' => 100,
     'sort' => 'newestfirst'
-  ]);
+  ], 'backfill');
 
   $queued = 0;
 

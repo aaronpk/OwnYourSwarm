@@ -36,25 +36,25 @@ class ProcessCheckin {
     ]);
   }
 
-  public static function getFoursquareCheckin($user, $checkin_id) {
+  public static function getFoursquareCheckin($user, $checkin_id, $context=null) {
     $params['v'] = '20170319';
     $params['oauth_token'] = $user->foursquare_access_token;
 
     $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin_id.'?'.http_build_query($params));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $info = json_decode(curl_exec($ch), true);
-    Log::fsq($user->id, 'checkins/'.$checkin_id, ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
+    Log::fsq($user->id, 'checkins/'.$checkin_id, $context, ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
     return $info;
   }
 
-  public static function getFoursquareCheckins($user, $params=[]) {
+  public static function getFoursquareCheckins($user, $params=[], $context=null) {
     $params['v'] = '20170319';
     $params['oauth_token'] = $user->foursquare_access_token;
 
     $ch = curl_init('https://api.foursquare.com/v2/users/self/checkins?'.http_build_query($params));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $info = json_decode(curl_exec($ch), true);
-    Log::fsq($user->id, 'users/self/checkins', ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
+    Log::fsq($user->id, 'users/self/checkins', $context, ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
     return $info;
   }
 
@@ -77,7 +77,7 @@ class ProcessCheckin {
     echo "User: " . $user->url . "\n";
     echo "Checkin: " . $checkin_id . "\n";
 
-    $info = self::getFoursquareCheckin($user, $checkin_id);
+    $info = self::getFoursquareCheckin($user, $checkin_id, 'ProcessCheckin::run');
 
     if(!isset($info['response']['checkin'])) {
       echo "Foursquare API returned invalid data for checkin: ".$checkin_id."\n";

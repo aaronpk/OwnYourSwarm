@@ -32,7 +32,7 @@ class FoursquarePermalink extends Controller {
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       $data = curl_exec($ch);
 
-      Log::fsq($user->id, 'checkins/'.$checkinID, ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
+      Log::fsq($user->id, 'checkins/'.$checkinID, 'web', ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
 
       $info = json_decode($data, true);
       if($info && !empty($info['response']['checkin'])) {
