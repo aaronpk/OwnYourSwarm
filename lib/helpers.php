@@ -4,6 +4,12 @@ ORM::configure('username', Config::$dbUsername);
 ORM::configure('password', Config::$dbPassword);
 ORM::configure('driver_options', [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4']);
 
+class Foursquare {
+  public static function userAgent() {
+    return Config::$baseURL;
+  }
+}
+
 class Log {
   private static $fp;
 

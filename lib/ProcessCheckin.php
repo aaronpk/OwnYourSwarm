@@ -42,6 +42,9 @@ class ProcessCheckin {
 
     $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin_id.'?'.http_build_query($params));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'User-Agent: '.Foursquare::userAgent()
+    ]);
     $info = json_decode(curl_exec($ch), true);
     Log::fsq($user->id, 'checkins/'.$checkin_id, $context, ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
     return $info;
@@ -53,6 +56,9 @@ class ProcessCheckin {
 
     $ch = curl_init('https://api.foursquare.com/v2/users/self/checkins?'.http_build_query($params));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'User-Agent: '.Foursquare::userAgent()
+    ]);
     $info = json_decode(curl_exec($ch), true);
     Log::fsq($user->id, 'users/self/checkins', $context, ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
     return $info;

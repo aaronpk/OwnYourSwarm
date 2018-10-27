@@ -91,6 +91,9 @@ class Foursquare extends Controller {
       'code' => $request->get('code')
     ]));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'User-Agent: '.Foursquare::userAgent()
+    ]);
     $data = curl_exec($ch);
     $token = json_decode($data, true);
     if($token && array_key_exists('access_token', $token)) {
@@ -100,6 +103,9 @@ class Foursquare extends Controller {
       // Retrieve user information
       $ch = curl_init('https://api.foursquare.com/v2/users/self?v=20170319&oauth_token='.$token['access_token']);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'User-Agent: '.Foursquare::userAgent()
+      ]);
       $data = curl_exec($ch);
       $info = json_decode($data, true);
       Log::fsq($this->user->id, 'users/self', 'oauth', ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
