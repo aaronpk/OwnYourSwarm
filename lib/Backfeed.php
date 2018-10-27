@@ -40,6 +40,11 @@ class Backfeed {
       return;
     }
 
+    // Skip running for users who have disabled backfeed entirely
+    if(!$user->send_responses_other_users && !$user->send_responses_swarm) {
+      return;
+    }
+
     echo "=============================================\n";
     echo date('Y-m-d H:i:s') . "\n";
     echo "User: " . $user->url . "\n";
@@ -90,23 +95,27 @@ class Backfeed {
   }
 
   public static function processBackfeedForSwarmCheckin($user, $checkin_data) {
+    if(!$user->send_responses_other_users)
+      return;
+
     $checkin = ORM::for_table('checkins')
       ->where('user_id', $user->id)
       ->where('foursquare_checkin_id', $checkin_data['id'])
       ->find_one();
     if($checkin) {
-      $cur_num_likes = $checkin_data['likes']['count'];
-      $cur_num_comments = $checkin_data['comments']['count'];
 
+      $cur_num_likes = $checkin_data['likes']['count'];
       if($cur_num_likes != $checkin->num_likes) {
         self::processLikes($user, $checkin, $checkin_data);
       }
+      $checkin->num_likes = $cur_num_likes;
+
+      $cur_num_comments = $checkin_data['comments']['count'];
       if($cur_num_comments != $checkin->num_comments) {
         self::processComments($user, $checkin, $checkin_data);
       }
-
-      $checkin->num_likes = $cur_num_likes;
       $checkin->num_comments = $cur_num_comments;
+
       $checkin->save();
     } else {
       #echo "Checkin not found in database: ".$checkin_data['id']."\n";

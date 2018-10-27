@@ -72,13 +72,20 @@ class Main extends Controller {
     if(!$this->currentUser($response))
       return $response;
 
-    if($request->get('micropub_style')) {
-      $this->user->micropub_style = $request->get('micropub_style');
-      $this->user->save();
+    $keys = ['micropub_style', 'send_responses_other_users', 'send_responses_swarm'];
+    $set = [];
+
+    foreach($keys as $k) {
+      if($request->get($k, null) !== null) {
+        $this->user->{$k} = $request->get($k) ? 1 : 0;
+        $set[$k] = $request->get($k) ? 1 : 0;
+      }
     }
 
+    $this->user->save();
+
     $response->headers->set('Content-Type', 'application/json');
-    $response->setContent(json_encode(['result'=>'ok']));
+    $response->setContent(json_encode(['result'=>'ok', 'set'=>$set]));
     return $response;
   }
 

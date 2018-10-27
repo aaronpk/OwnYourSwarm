@@ -13,7 +13,7 @@
   <div class="ui success message">
     <p><b>Your account is active!</b></p>
     <p>
-      Your future checkins will be sent to your site as a Micropub request! 
+      Your future checkins will be sent to your site as a Micropub request!
       <!-- Review the <a href="/docs">documentation</a> to see an example of what OwnYourSwarm will send. -->
       Once you check in, you'll see a preview of the Micropub request OwnYourSwarm sends below.
     </p>
@@ -23,7 +23,9 @@
 <br>
 
 <div class="panel">
-  <h3>Micropub Options</h3>
+  <h3>Import Options</h3>
+
+  <h4>Micropub</h4>
 
   <p>Choose how you would like OwnYourSwarm to send checkins to your website. If your software doesn't support checkins natively, you can use the "Simple" option to have it send a plaintext version of the checkins, which will appear on your site like regular notes.</p>
 
@@ -40,6 +42,27 @@
         <div class="ui radio checkbox">
           <input type="radio" name="micropub_style" <?= $user->micropub_style == 'simple' ? 'checked="checked"' : '' ?> class="hidden" value="simple">
           <label>Simple - This will send a form-encoded request with the checkin information in the post contents, e.g. "Checked in to ______". Photos will be sent as a file upload.</label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <h4>Comments and Responses</h4>
+
+  <div class="ui form">
+    <div class="grouped fields" id="send_responses_option">
+
+      <div class="field">
+        <div class="ui toggle checkbox">
+          <input type="checkbox" <?= $user->send_responses_other_users == '1' ? 'checked="checked"' : '' ?>class="hidden" name="send_responses_other_users">
+          <label>Send Webmentions for comments and likes from other Swarm users</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui toggle checkbox">
+          <input type="checkbox" <?= $user->send_responses_swarm == '1' ? 'checked="checked"' : '' ?>class="hidden" name="send_responses_swarm">
+          <label>Send Webmentions for system comments from Swarm</label>
         </div>
       </div>
 
@@ -137,7 +160,7 @@
 
 <script>
 $(function(){
-  $('.ui.radio.checkbox').checkbox();
+  $('.ui.checkbox').checkbox();
 
   $.get("/user/syndication-targets.json", function(data){
     handle_discovered_syndication_targets(data);
@@ -147,6 +170,16 @@ $(function(){
     $.post('/user/prefs.json', {
       micropub_style: $("input[name=micropub_style]:checked").val()
     }, function(){
+    });
+  });
+
+  $("#send_responses_option .checkbox").click(function(e){
+    var name = $($(this).children('input')[0]).attr('name');
+    var val = $("#send_responses_option").form('get value', name);
+    var params = {};
+    params[name] = val == "on" ? 1 : 0;
+
+    $.post('/user/prefs.json', params, function(){
     });
   });
 

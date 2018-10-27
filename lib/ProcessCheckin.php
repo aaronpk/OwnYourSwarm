@@ -197,7 +197,7 @@ class ProcessCheckin {
 
       $checkin->save();
 
-      if($canonical_url) {
+      if($canonical_url && $user->send_responses_swarm) {
         self::scheduleWebmentionJobForCoins($checkin);
       }
     } else {
@@ -296,7 +296,8 @@ class ProcessCheckin {
           echo $micropub_response['response']."\n";
         }
 
-        self::scheduleWebmentionJobForCoins($checkin, 30);
+        if($user->send_responses_swarm)
+          self::scheduleWebmentionJobForCoins($checkin, 30);
       } else {
         echo "No changes found\n";
       }
@@ -334,6 +335,9 @@ class ProcessCheckin {
       echo "User not found\n";
       return;
     }
+
+    if(!$user->send_responses_swarm)
+      return;
 
     $data = json_decode($checkin->foursquare_data, true);
     if(!empty($data['score']) && !empty($data['score']['scores'])) {
