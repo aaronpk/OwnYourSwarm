@@ -33,13 +33,15 @@ foreach($users as $user) {
       if($data['createdAt'] < strtotime($user->date_created) || $data['createdAt'] < strtotime('2017-05-16T09:00:00+0200'))
         continue;
 
+      $process = false;
+
       // Check the database to see if the checkin was already imported
-      $exists = ORM::for_table('checkins')
+      $checkin = ORM::for_table('checkins')
         ->where('user_id', $user->id)
         ->where('foursquare_checkin_id', $data['id'])
         ->find_one();
-      if(!$exists) {
-        echo "Found a checkin that was not yet imported: ".$data['id']."\n";
+      if(!$checkin) {
+        echo "Found a checkin that was not yet imported to the DB: ".$data['id']."\n";
 
         $checkin = ORM::for_table('checkins')->create();
         $checkin->user_id = $user->id;
@@ -51,11 +53,17 @@ foreach($users as $user) {
         $checkin->pending = 1;
         $checkin->save();
 
+        $process = true;
+      } else {
+        // The checkin was imported into the DB, but wasn't yet successfully imported to the micropub endpoint
+        if($user->id == 1 && !$checkin->canonical_url)
+          $process = true;
+      }
+
+      if($process) {
         q()->queue('ProcessCheckin', 'run', [$checkin->user_id, $checkin->foursquare_checkin_id, true], [
           'delay' => (5 * $queued++) // Stagger the import jobs by 5 seconds
         ]);
-      } else {
-        # echo "Already imported: ".$checkin['id']."\n";
       }
 
     }
