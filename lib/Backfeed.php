@@ -8,11 +8,11 @@ class Backfeed {
   ];
 
   public static function nextTier($tier) {
-    $index = array_search((int)$tier, self::$tiers);
-    if(array_key_exists($index+1, self::$tiers))
-      return self::$tiers[$index+1];
-    else
-      return false;
+    foreach(self::$tiers as $t) {
+      if($t > $tier)
+        return $t;
+    }
+    return $tier;
   }
 
   private static function scheduleNext(&$user) {
