@@ -44,9 +44,7 @@ class Backfeed {
     echo date('Y-m-d H:i:s') . "\n";
     echo "User: " . $user->url . "\n";
 
-    $ch = curl_init('https://api.foursquare.com/v2/users/self/checkins?v=20170319&oauth_token='.$user->foursquare_access_token);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $info = json_decode(curl_exec($ch), true);
+    $info = ProcessCheckin::getFoursquareCheckins($user);
 
     if(!isset($info['response']['checkins'])) {
       echo "No checkins found\n";
@@ -79,9 +77,7 @@ class Backfeed {
     echo "Checkin: " . $checkin->foursquare_checkin_id . "\n";
     echo $checkin->canonical_url . "\n";
 
-    $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin->foursquare_checkin_id.'?v=20170319&oauth_token='.$user->foursquare_access_token);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $info = json_decode(curl_exec($ch), true);
+    $info = ProcessCheckin::getFoursquareCheckin($user, $checkin->foursquare_checkin_id);
 
     if(!isset($info['response']['checkin'])) {
       echo "Foursquare API returned invalid data for checkin: ".$checkin->foursquare_checkin_id."\n";
@@ -147,10 +143,7 @@ class Backfeed {
   }
 
   public static function processComments(&$user, &$checkin, $data) {
-    // Fetch the checkin from Foursquare since the comments are not returned in the list view
-    $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin->foursquare_checkin_id.'?v=20170319&oauth_token='.$user->foursquare_access_token);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $info = json_decode(curl_exec($ch), true);
+    $info = ProcessCheckin::getFoursquareCheckin($user, $checkin->foursquare_checkin_id);
 
     if(!isset($info['response']['checkin'])) {
       echo "Checkin not found\n";

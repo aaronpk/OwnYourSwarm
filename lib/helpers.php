@@ -4,6 +4,22 @@ ORM::configure('username', Config::$dbUsername);
 ORM::configure('password', Config::$dbPassword);
 ORM::configure('driver_options', [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4']);
 
+class Log {
+  private static $fp;
+
+  public static function fsq($user_id, $method, $details=null) {
+    if(!isset(self::$fp)) {
+      self::$fp = fopen(__DIR__.'/../scripts/logs/foursquare.log', 'a');
+    }
+
+    $line = date('Y-m-d H:i:s').' ['.$user_id.'] '.$method;
+    if($details)
+      $line .= ' '.json_encode($details, JSON_UNESCAPED_SLASHES);
+
+    fwrite(self::$fp, $line."\n");
+  }
+}
+
 function view($template, $data=[]) {
   global $templates;
   return $templates->render($template, $data);

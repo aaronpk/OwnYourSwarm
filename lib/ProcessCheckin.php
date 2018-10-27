@@ -37,9 +37,13 @@ class ProcessCheckin {
   }
 
   public static function getFoursquareCheckin($user, $checkin_id) {
-    $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin_id.'?v=20170319&oauth_token='.$user->foursquare_access_token);
+    $params['v'] = '20170319';
+    $params['oauth_token'] = $user->foursquare_access_token;
+
+    $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin_id.'?'.http_build_query($params));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $info = json_decode(curl_exec($ch), true);
+    Log::fsq($user->id, 'checkins/'.$checkin_id, ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
     return $info;
   }
 
@@ -50,6 +54,7 @@ class ProcessCheckin {
     $ch = curl_init('https://api.foursquare.com/v2/users/self/checkins?'.http_build_query($params));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $info = json_decode(curl_exec($ch), true);
+    Log::fsq($user->id, 'users/self/checkins', ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
     return $info;
   }
 

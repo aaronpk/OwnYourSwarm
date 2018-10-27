@@ -1,7 +1,7 @@
 <?php
 namespace Controllers;
 
-use Config, ORM;
+use Config, ORM, Log;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use DateTime, DateTimeZone;
@@ -80,6 +80,7 @@ class Foursquare extends Controller {
       return $response;
     }
 
+    Log::fsq($this->user->id, 'oauth2/access_token');
     // Get a Foursquare access token
     $ch = curl_init('https://foursquare.com/oauth2/access_token');
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
@@ -101,6 +102,7 @@ class Foursquare extends Controller {
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       $data = curl_exec($ch);
       $info = json_decode($data, true);
+      Log::fsq($this->user->id, 'users/self', ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
       if($info && array_key_exists('response', $info) && array_key_exists('user', $info['response'])) {
         $this->user->foursquare_user_id = $info['response']['user']['id'];
         $this->user->foursquare_url = $info['response']['user']['canonicalUrl'];

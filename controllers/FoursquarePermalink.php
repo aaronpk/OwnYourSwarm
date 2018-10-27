@@ -1,7 +1,7 @@
 <?php
 namespace Controllers;
 
-use Config, ORM;
+use Config, ORM, Log;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use DateTime, DateTimeZone;
@@ -31,6 +31,9 @@ class FoursquarePermalink extends Controller {
       $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkinID.'?v=20170319&oauth_token='.$user->foursquare_access_token);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       $data = curl_exec($ch);
+
+      Log::fsq($user->id, 'checkins/'.$checkinID, ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
+
       $info = json_decode($data, true);
       if($info && !empty($info['response']['checkin'])) {
         $checkinData = $info['response']['checkin'];
