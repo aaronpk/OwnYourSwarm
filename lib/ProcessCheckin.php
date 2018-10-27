@@ -83,7 +83,26 @@ class ProcessCheckin {
     echo "User: " . $user->url . "\n";
     echo "Checkin: " . $checkin_id . "\n";
 
+    // Load checkin if already written to the DB
+    $checkin = ORM::for_table('checkins')
+      ->where('user_id', $user->id)
+      ->where('foursquare_checkin_id', $checkin_id)
+      ->find_one();
+
     $info = self::getFoursquareCheckin($user, $checkin_id, 'ProcessCheckin::run');
+
+    if(isset($info['meta']['errorDetail']) && $info['meta']['errorDetail'] == 'Invalid checkin id') {
+      if($checkin) {
+        // If the checkin was deleted, mark as not pending
+        $checkin->pending = 0;
+        $checkin->success = 0;
+        $checkin->poll_interval = 0;
+        $checkin->date_next_poll = null;
+        $checkin->save();
+        echo "Checkin was deleted\n";
+        return;
+      }
+    }
 
     if(!isset($info['response']['checkin'])) {
       echo "Foursquare API returned invalid data for checkin: ".$checkin_id."\n";
@@ -92,10 +111,6 @@ class ProcessCheckin {
       return;
     }
 
-    $checkin = ORM::for_table('checkins')
-      ->where('user_id', $user->id)
-      ->where('foursquare_checkin_id', $checkin_id)
-      ->find_one();
     if(!$checkin) {
       $checkin = ORM::for_table('checkins')->create();
       $checkin->user_id = $user->id;

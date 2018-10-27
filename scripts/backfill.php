@@ -56,7 +56,7 @@ foreach($users as $user) {
         $process = true;
       } else {
         // The checkin was imported into the DB, but wasn't yet successfully imported to the micropub endpoint
-        if($user->id == 1 && !$checkin->canonical_url)
+        if($checkin->pending == 1 && !$checkin->canonical_url)
           $process = true;
       }
 
