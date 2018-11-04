@@ -18,6 +18,8 @@ CREATE TABLE `users` (
   `include_private_checkins` tinyint(4) DEFAULT '1',
   `send_responses_swarm` tinyint(4) DEFAULT '1',
   `send_responses_other_users` tinyint(4) DEFAULT '1',
+  `exclude_checkins_by_others` tinyint(4) DEFAULT '0',
+  `exclude_blank_checkins` tinyint(4) DEFAULT '0',
   `date_created` datetime DEFAULT NULL,
   `last_login` datetime DEFAULT NULL,
   `last_micropub_response` text,

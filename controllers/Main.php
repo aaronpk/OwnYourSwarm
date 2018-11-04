@@ -72,7 +72,9 @@ class Main extends Controller {
     if(!$this->currentUser($response))
       return $response;
 
-    $keys = ['micropub_style', 'include_private_checkins', 'send_responses_other_users', 'send_responses_swarm'];
+    $keys = ['micropub_style', 'include_private_checkins', 'mark_all_private',
+      'send_responses_other_users', 'send_responses_swarm',
+      'exclude_checkins_by_others', 'exclude_blank_checkins'];
     $set = [];
 
     foreach($keys as $k) {

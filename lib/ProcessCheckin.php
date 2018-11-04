@@ -131,6 +131,27 @@ class ProcessCheckin {
       return;
     }
 
+    // Check if the user is excluding checkins by others
+    if($user->exclude_checkins_by_others) {
+      $data = $info['response']['checkin'];
+      if(isset($data['createdBy']) && $data['createdBy']['id'] != $data['user']['id']) {
+        $checkin->pending = 0;
+        $checkin->save();
+        echo "Checkin created by another user, skipping\n";
+        return;
+      }
+    }
+
+    // See if the checkin contains no other content
+    if($user->exclude_blank_checkins) {
+      if(!self::checkinHasContent($info['response']['checkin'])) {
+        $checkin->pending = 0;
+        $checkin->save();
+        echo "Checkin was empty, skipping\n";
+        return;
+      }
+    }
+
     // New checkin
     if(!$checkin->canonical_url) {
       $entry = self::checkinToHEntry($info['response']['checkin'], $user);
@@ -451,6 +472,10 @@ class ProcessCheckin {
     }
 
     return $content;
+  }
+
+  public static function checkinHasContent($checkin) {
+    return !empty($checkin['photos']['items']) || !empty($checkin['shout']);
   }
 
   public static function checkinToHEntry($checkin, &$user) {

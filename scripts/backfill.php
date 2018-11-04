@@ -58,6 +58,18 @@ foreach($users as $user) {
         // The checkin was imported into the DB, but wasn't yet successfully imported to the micropub endpoint
         if($checkin->pending == 1 && !$checkin->canonical_url)
           $process = true;
+
+        // For checkins already marked as complete that weren't sent to the user,
+        // check if there was new content added to the checkin, since that may mean
+        // it should now be sent
+        if($checkin->pending == 0 && !$checkin->canonical_url) {
+          if($user->exclude_blank_checkins) {
+            if(ProcessCheckin::checkinHasContent($data)) {
+              $checkin->pending = 1;
+              $checkin->save();
+            }
+          }
+        }
       }
 
       if($process) {

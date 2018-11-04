@@ -92,6 +92,27 @@
     </div>
   </div>
 
+  <h4>Exclude Checkins</h4>
+
+  <div class="ui form">
+    <div class="grouped fields" id="filter_checkins_option">
+
+      <div class="field">
+        <div class="ui toggle checkbox">
+          <input type="checkbox" <?= $user->exclude_checkins_by_others == '1' ? 'checked="checked"' : '' ?>class="hidden" name="exclude_checkins_by_others">
+          <label>Exclude checkins when you have been checked in by other people</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui toggle checkbox">
+          <input type="checkbox" <?= $user->exclude_blank_checkins == '1' ? 'checked="checked"' : '' ?>class="hidden" name="exclude_blank_checkins">
+          <label>Exclude checkins if there is no photo or text</label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <br>
@@ -226,6 +247,16 @@ $(function(){
   $("#private_checkins .checkbox").click(function(e){
     var name = $($(this).children('input')[0]).attr('name');
     var val = $("#private_checkins").form('get value', name);
+    var params = {};
+    params[name] = (val == "on" ? 1 : 0);
+
+    $.post('/user/prefs.json', params, function(){
+    });
+  });
+
+  $("#filter_checkins_option .checkbox").click(function(e){
+    var name = $($(this).children('input')[0]).attr('name');
+    var val = $("#filter_checkins_option").form('get value', name);
     var params = {};
     params[name] = (val == "on" ? 1 : 0);
 
