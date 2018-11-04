@@ -68,7 +68,7 @@ class FoursquarePermalink extends Controller {
         $hEntry['properties']['like'] = [];
         foreach($group['items'] as $like) {
           $hash = self::hashForResponse($checkinData, 'like', $like);
-          $hEntry['properties']['like'][] = self::urlForResponseHash($user->foursquare_user_id, 
+          $hEntry['properties']['like'][] = self::urlForResponseHash($user->foursquare_user_id,
             $checkinData['id'], 'like', $hash);
         }
       }
@@ -77,7 +77,7 @@ class FoursquarePermalink extends Controller {
       $hEntry['properties']['comment'] = [];
       foreach($checkinData['comments']['items'] as $comment) {
         $hash = self::hashForResponse($checkinData, 'comment', $comment);
-        $hEntry['properties']['comment'][] = self::urlForResponseHash($user->foursquare_user_id, 
+        $hEntry['properties']['comment'][] = self::urlForResponseHash($user->foursquare_user_id,
           $checkinData['id'], 'comment', $hash);
       }
     }
@@ -86,7 +86,7 @@ class FoursquarePermalink extends Controller {
         $hEntry['properties']['comment'] = [];
       foreach($checkinData['score']['scores'] as $score) {
         $hash = self::hashForResponse($checkinData, 'coin', $score);
-        $hEntry['properties']['comment'][] = self::urlForResponseHash($user->foursquare_user_id, 
+        $hEntry['properties']['comment'][] = self::urlForResponseHash($user->foursquare_user_id,
           $checkinData['id'], 'coin', $hash);
       }
     }
@@ -124,7 +124,7 @@ class FoursquarePermalink extends Controller {
     // Find the comment data given the hash
     switch($args['type']) {
       case 'coin':
-        $responses = $checkinData['score']['scores']; 
+        $responses = $checkinData['score']['scores'];
         break;
       case 'like':
         $responses = [];
@@ -133,10 +133,10 @@ class FoursquarePermalink extends Controller {
         }
         break;
       case 'comment':
-        $responses = $checkinData['comments']['items']; 
+        $responses = $checkinData['comments']['items'];
         break;
       default:
-        $responses = [];        
+        $responses = [];
     }
 
     $webmention = false;
@@ -163,7 +163,7 @@ class FoursquarePermalink extends Controller {
               $webmention->content .= '<img src="'.$sticker_url.'" alt="'.htmlspecialchars($r['sticker']['name']).'">';
             }
             break;
-          case 'coin': 
+          case 'coin':
             $webmention->author_photo = $r['icon'];
             $webmention->author_name = null;
             $webmention->author_url = null;
