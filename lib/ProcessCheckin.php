@@ -475,7 +475,11 @@ class ProcessCheckin {
   }
 
   public static function checkinHasContent($checkin) {
-    return !empty($checkin['photos']['items']) || !empty($checkin['shout']);
+    $shout = $checkin['shout'] ?? '';
+    if($shout) {
+      $shout = preg_replace('/^with .+$/', '', $shout);
+    }
+    return !empty($checkin['photos']['items']) || $shout;
   }
 
   public static function checkinToHEntry($checkin, &$user) {
