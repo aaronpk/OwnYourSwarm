@@ -72,10 +72,16 @@ class Main extends Controller {
     if(!$this->currentUser($response))
       return $response;
 
-    $keys = ['micropub_style', 'include_private_checkins', 'mark_all_private',
+    $keys = ['include_private_checkins', 'mark_all_private',
       'send_responses_other_users', 'send_responses_swarm',
       'exclude_checkins_by_others', 'exclude_blank_checkins'];
     $set = [];
+
+    $k = 'micropub_style';
+    if($request->get($k, null) !== null) {
+      $this->user->{$k} = $request->get($k);
+      $set[$k] = $request->get($k);
+    }
 
     foreach($keys as $k) {
       if($request->get($k, null) !== null) {
@@ -280,8 +286,8 @@ class Main extends Controller {
       return $response;
 
     switch($request->get('action')) {
-      case 'create': 
-        
+      case 'create':
+
         $rule = ORM::for_table('syndication_rules')->create();
         $rule->user_id = $this->user->id;
         $rule->type = $request->get('type');
