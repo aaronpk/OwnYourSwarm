@@ -37,6 +37,7 @@ class Main extends Controller {
 
     $other_accounts = ORM::for_table('users')
       ->where('foursquare_user_id', $this->user->foursquare_user_id)
+      ->where_not_equal('foursquare_user_id', '')
       ->where_not_equal('id', $this->user->id)
       ->count();
 
