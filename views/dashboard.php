@@ -6,7 +6,7 @@
     <p>
       Your Micropub endpoint returned an error too many times in a row.
       <!-- Review the <a href="/docs">documentation</a> to see an example of what OwnYourSwarm will send. -->
-      If you would like to re-enable sending checkins to your Micropub endpoint, use the <a href="/import">import tool</a> to test your endpoint. If you successfully post a checkin to your enpdoint, importing will be re-enabled.
+      If you would like to re-enable sending checkins to your Micropub endpoint, use the <a href="/import">import tool</a> to test your website. If you successfully post a checkin to your enpdoint, importing will be re-enabled.
     </p>
   </div>
 <?php else: ?>
@@ -14,8 +14,7 @@
     <p><b>Your account is active!</b></p>
     <p>
       Your future checkins will be sent to your site as a Micropub request!
-      <!-- Review the <a href="/docs">documentation</a> to see an example of what OwnYourSwarm will send. -->
-      Once you check in, you'll see a preview of the Micropub request OwnYourSwarm sends below.
+      You can <a href="/import">import</a> recent checkins or test your website there.
     </p>
   </div>
 <?php endif ?>

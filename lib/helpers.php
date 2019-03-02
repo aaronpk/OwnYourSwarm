@@ -94,7 +94,7 @@ function k($a, $k, $default=null) {
 
 function micropub_get($user, $params) {
   $endpoint = $user->micropub_endpoint;
-  
+
   $url = parse_url($endpoint);
   if(!k($url, 'query')) {
     $url['query'] = http_build_query($params);
@@ -130,7 +130,10 @@ function micropub_post($user, $params, $content_type='json') {
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_HEADER, true);
 
-  $httpheaders = array('Authorization: Bearer ' . $user->micropub_access_token);
+  $httpheaders = [
+    'Authorization: Bearer ' . $user->micropub_access_token,
+    'User-Agent: OwnYourSwarm ('.Config::$baseURL.')'
+  ];
 
   if($content_type == 'json') {
     $httpheaders[] = 'Content-Type: application/json';
