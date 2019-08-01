@@ -3,7 +3,8 @@
 class ProcessCheckin {
 
   public static $tiers = [
-    1,15,30,60,120,300,600,1800,3600,14400
+    #1,15,30,60,120,300,600,1800,3600,14400
+    15,60,300,600,1800,3600,14400
   ];
 
   public static function nextTier($tier) {
@@ -40,13 +41,20 @@ class ProcessCheckin {
     $params['v'] = '20170319';
     $params['oauth_token'] = $user->foursquare_access_token;
 
-    $ch = curl_init('https://api.foursquare.com/v2/checkins/'.$checkin_id.'?'.http_build_query($params));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    $http = new p3k\HTTP();
+    $headers = [
       'User-Agent: '.Foursquare::userAgent()
+    ];
+    $response = $http->get('https://api.foursquare.com/v2/checkins/'.$checkin_id.'?'.http_build_query($params), $headers);
+    $info = json_decode($response['body'], true);
+    
+    Log::fsq($user->id, 'checkins/'.$checkin_id, $context, [
+      'http' => $response['code'],
+      'RateLimit-Limit' => ($response['headers']['X-Ratelimit-Limit']??''),
+      'RateLimit-Remaining' => ($response['headers']['X-Ratelimit-Remaining']??''),
+      'headers' => $response['headers'],
     ]);
-    $info = json_decode(curl_exec($ch), true);
-    Log::fsq($user->id, 'checkins/'.$checkin_id, $context, ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
+    
     return $info;
   }
 
@@ -54,13 +62,20 @@ class ProcessCheckin {
     $params['v'] = '20170319';
     $params['oauth_token'] = $user->foursquare_access_token;
 
-    $ch = curl_init('https://api.foursquare.com/v2/users/self/checkins?'.http_build_query($params));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    $http = new p3k\HTTP();
+    $headers = [
       'User-Agent: '.Foursquare::userAgent()
+    ];
+    $response = $http->get('https://api.foursquare.com/v2/users/self/checkins?'.http_build_query($params), $headers);
+    $info = json_decode($response['body'], true);
+
+    Log::fsq($user->id, 'users/self/checkins', $context, [
+      'http' => $response['code'],
+      'RateLimit-Limit' => ($response['headers']['X-Ratelimit-Limit']??''),
+      'RateLimit-Remaining' => ($response['headers']['X-Ratelimit-Remaining']??''),
+      'headers' => $response['headers'],
     ]);
-    $info = json_decode(curl_exec($ch), true);
-    Log::fsq($user->id, 'users/self/checkins', $context, ['http'=>curl_getinfo($ch, CURLINFO_RESPONSE_CODE)]);
+
     return $info;
   }
 
@@ -76,6 +91,11 @@ class ProcessCheckin {
     $user = ORM::for_table('users')->find_one($user_id);
     if(!$user) {
       echo "User not found\n";
+      return;
+    }
+    
+    if($user->foursquare_access_token == '') {
+      echo "No Foursquare access token for this user\n";
       return;
     }
 
@@ -475,7 +495,7 @@ class ProcessCheckin {
   }
 
   public static function checkinHasContent($checkin) {
-    $shout = $checkin['shout'] ?? '';
+    $shout = isset($checkin['shout']) ? $checkin['shout'] : '';
     if($shout) {
       $shout = preg_replace('/^with .+$/', '', $shout);
     }

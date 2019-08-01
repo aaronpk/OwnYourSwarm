@@ -2,7 +2,7 @@
   "require": {
     "j4mie/idiorm": "1.5.*",
     "predis/predis": "1.*",
-    "mf2/mf2": "0.3.*",
+    "mf2/mf2": "^0.4.6",
     "indieauth/client": ">=0.2.0",
     "indieweb/mention-client": ">=1.2",
     "pda/pheanstalk": "dev-master",
@@ -10,7 +10,8 @@
     "league/plates": "^3.3",
     "league/route": "1.*",
     "p3k/caterpillar": "^0.1.1",
-    "p3k/multipart": "*"
+    "p3k/multipart": "*",
+    "p3k/http": "^0.1.8"
   },
   "autoload": {
     "psr-4": {

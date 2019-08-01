@@ -4,7 +4,7 @@ class Backfeed {
 
   public static $tiers = [
     #1,5,10,15,30,60
-    30,60,120,300,600,1800,3600,86400,86400*2,86400*7,86400*14,86400*30
+    30,120,300,1800,86400,86400*2,86400*7,86400*14,86400*30
   ];
 
   public static function nextTier($tier) {
@@ -16,13 +16,13 @@ class Backfeed {
   }
 
   private static function scheduleNext(&$user) {
-    $next = self::nextTier($user->poll_interval);
+    $next = self::nextTier($user->backfeed_poll_interval);
     if($next) {
-      $user->poll_interval = $next;
-      $user->date_next_poll = date('Y-m-d H:i:s', time()+$next);
+      $user->backfeed_poll_interval = $next;
+      $user->date_next_backfeed_poll = date('Y-m-d H:i:s', time()+$next);
     } else {
-      $user->poll_interval = 0;
-      $user->date_next_poll = null;
+      $user->backfeed_poll_interval = 0;
+      $user->date_next_backfeed_poll = null;
     }
     $user->save();
     return $next;
@@ -53,11 +53,10 @@ class Backfeed {
 
     if(!isset($info['response']['checkins'])) {
       echo "No checkins found\n";
-      return;
-    }
-
-    foreach($info['response']['checkins']['items'] as $checkin_data) {
-      self::processBackfeedForSwarmCheckin($user, $checkin_data);
+    } else {  
+      foreach($info['response']['checkins']['items'] as $checkin_data) {
+        self::processBackfeedForSwarmCheckin($user, $checkin_data);
+      }
     }
 
     self::scheduleNext($user);

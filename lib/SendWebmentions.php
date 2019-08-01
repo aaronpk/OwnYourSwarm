@@ -31,6 +31,22 @@ class SendWebmentions {
       $webmention->response_location = $response['headers']['Location'];
     $webmention->save();
 
+    $user = ORM::for_table('users')->find_one($checkin->user_id);
+    if(!in_array($response['code'],[200,201,202])) {
+      // No webmention endpoint found for this checkin, or webmention failed
+      $user->failed_webmentions = $user->failed_webmentions + 1;
+    } else {
+      $user->failed_webmentions = 0;
+    }
+      
+    // After 10 failed webmentions, disable checking backfeed completely
+    if($user->failed_webmentions > 10) {
+      $user->send_responses_swarm = 0;
+      $user->send_responses_other_users = 0;
+    }
+    
+    $user->save();
+
     echo "code: ".$response['code']."\n";
     if(isset($response['headers']['Location']))
       echo "status: ".$response['headers']['Location']."\n";
