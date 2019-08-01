@@ -233,8 +233,8 @@ class ProcessCheckin {
         $user->micropub_failures = 0;
 
         // Reset backfeed schedule
-        $user->poll_interval = 30;
-        $user->date_next_poll = date('Y-m-d H:i:s', time()+30);
+        $user->backfeed_poll_interval = 30;
+        $user->date_next_backfeed_poll = date('Y-m-d H:i:s', time()+30);
 
         $user->save();
       } else {
