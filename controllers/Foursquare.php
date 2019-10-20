@@ -83,8 +83,7 @@ class Foursquare extends Controller {
 
     Log::fsq($this->user->id, 'oauth2/access_token', 'oauth');
     // Get a Foursquare access token
-    $ch = curl_init('https://foursquare.com/oauth2/access_token');
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+    $ch = curl_init('https://foursquare.com/oauth2/access_token?'.http_build_query([
       'client_id' => Config::$foursquareClientID,
       'client_secret' => Config::$foursquareClientSecret,
       'grant_type' => 'authorization_code',
