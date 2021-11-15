@@ -46,6 +46,9 @@ class Backfeed {
       return;
     }
 
+    if(import_disabled($user))
+      return;
+
     echo "=============================================\n";
     echo date('Y-m-d H:i:s') . "\n";
     echo "User: " . $user->url . "\n";
@@ -54,7 +57,7 @@ class Backfeed {
 
     if(!isset($info['response']['checkins'])) {
       echo "No checkins found\n";
-    } else {  
+    } else {
       foreach($info['response']['checkins']['items'] as $checkin_data) {
         self::processBackfeedForSwarmCheckin($user, $checkin_data);
       }

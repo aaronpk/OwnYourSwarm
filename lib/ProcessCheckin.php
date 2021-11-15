@@ -77,6 +77,11 @@ class ProcessCheckin {
       'headers' => $response['headers'],
     ]);
 
+    if(isset($info['response']['checkins']['items'][0])) {
+      $user->last_checkin_date = date('Y-m-d H:i:s', $info['response']['checkins']['items'][0]['createdAt']);
+      $user->save();
+    }
+
     return $info;
   }
 

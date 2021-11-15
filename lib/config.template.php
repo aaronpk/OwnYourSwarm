@@ -15,4 +15,6 @@ class Config {
   public static $foursquareClientID = '';
   public static $foursquareClientSecret = '';
   public static $foursquareClientPushSecret = '';
+
+  public static $newUsersAllowed = true;
 }
