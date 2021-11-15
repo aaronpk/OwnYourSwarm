@@ -9,6 +9,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Auth extends Controller {
 
+  private static function buildClientID() {
+    return Config::$baseURL . '/';
+  }
+
   private static function buildRedirectURI() {
     return Config::$baseURL . '/auth/callback';
   }
@@ -51,7 +55,7 @@ class Auth extends Controller {
       $_SESSION['auth_me'] = $me;
 
       $scope = 'create update';
-      $authorizationURL = IndieAuth\Client::buildAuthorizationURL($authorizationEndpoint, $me, self::buildRedirectURI(), Config::$baseURL, $state, $scope);
+      $authorizationURL = IndieAuth\Client::buildAuthorizationURL($authorizationEndpoint, $me, self::buildRedirectURI(), self::buildClientID(), $state, $scope);
     } else {
       $authorizationURL = false;
     }
@@ -134,7 +138,7 @@ class Auth extends Controller {
     $tokenEndpoint = IndieAuth\Client::discoverTokenEndpoint($me);
 
     if($tokenEndpoint) {
-      $token = IndieAuth\Client::getAccessToken($tokenEndpoint, $request->get('code'), $me, self::buildRedirectURI(), Config::$baseURL, $request->get('state'), true);
+      $token = IndieAuth\Client::getAccessToken($tokenEndpoint, $request->get('code'), $me, self::buildRedirectURI(), self::buildClientID(), $request->get('state'), true);
 
     } else {
       $token = array('auth'=>false, 'response'=>false);
