@@ -4,7 +4,8 @@ class ProcessCheckin {
 
   public static $tiers = [
     #1,15,30,60,120,300,600,1800,3600,14400
-    15,60,300,600,1800,3600,14400
+    #15,60,300,600,1800,3600,14400
+    60, 300, 1800, 7200, 14400, 86400,
   ];
 
   public static function nextTier($tier) {
