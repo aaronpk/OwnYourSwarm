@@ -50,6 +50,23 @@ class Main extends Controller {
     return $response;
   }
 
+  public function user_details(Request $request, Response $response) {
+    if(!$this->currentUser($response))
+      return $response;
+
+    $credentials = [
+      'foursquare_access_token' => $this->user->foursquare_access_token,
+      'micropub_endpoint' => $this->user->micropub_endpoint,
+      'micropub_access_token' => $this->user->micropub_access_token,
+    ]; 
+    
+    $response->setContent(view('user-details', [
+      'user' => $this->user,
+      'credentials' => $credentials,
+    ]));
+    return $response;
+  }
+
   public function import(Request $request, Response $response) {
     if(!$this->currentUser($response))
       return $response;

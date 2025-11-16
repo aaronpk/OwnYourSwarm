@@ -24,6 +24,7 @@ $router->addRoute('POST', '/user/prefs.json', 'Controllers\\Main::save_user_pref
 $router->addRoute('GET', '/user/syndication-targets.json', 'Controllers\\Main::get_syndication_targets');
 $router->addRoute('POST', '/user/syndication-targets.json', 'Controllers\\Main::reload_syndication_targets');
 $router->addRoute('POST', '/user/syndication-rules.json', 'Controllers\\Main::post_syndication_rules');
+$router->addRoute('GET', '/user/details', 'Controllers\\Main::user_details');
 
 $router->addRoute('GET', '/checkin/{checkin}/{hash}', 'Controllers\\Foursquare::comment');
 
