@@ -31,9 +31,10 @@ $router->addRoute('GET', '/user/{userid}/checkin/{checkin}/{type}/{hash}', 'Cont
 $router->addRoute('GET', '/user/{userid}/checkin/{checkin}', 'Controllers\\FoursquarePermalink::checkin');
 
 $router->addRoute('GET', '/auth/signin', 'Controllers\\Auth::signin');
-$router->addRoute('GET', '/auth/start', 'Controllers\\Auth::start');
+$router->addRoute('POST', '/auth/start', 'Controllers\\Auth::start');
 $router->addRoute('GET', '/auth/signout', 'Controllers\\Auth::signout');
 $router->addRoute('GET', '/auth/callback', 'Controllers\\Auth::callback');
+$router->addRoute('GET', '/client.json', 'Controllers\\Auth::client_metadata');
 
 $router->addRoute('GET', '/foursquare', 'Controllers\\Foursquare::index');
 $router->addRoute('GET', '/foursquare/auth', 'Controllers\\Foursquare::auth');

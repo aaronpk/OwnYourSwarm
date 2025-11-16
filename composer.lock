@@ -1,52 +1,11 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "hash": "ee818dd272019744c7b9164135078a47",
-    "content-hash": "b62489215f5f46b9b68dd99a18a0bc21",
+    "content-hash": "d79c6a1510c5362244e50c9b4a6d0899",
     "packages": [
-        {
-            "name": "barnabywalters/mf-cleaner",
-            "version": "v0.1.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/barnabywalters/php-mf-cleaner.git",
-                "reference": "ef6a16628db6e8aee2b4f8bb8093d18c24b74cd4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/barnabywalters/php-mf-cleaner/zipball/ef6a16628db6e8aee2b4f8bb8093d18c24b74cd4",
-                "reference": "ef6a16628db6e8aee2b4f8bb8093d18c24b74cd4",
-                "shasum": ""
-            },
-            "require-dev": {
-                "php": ">=5.3",
-                "phpunit/phpunit": "*"
-            },
-            "suggest": {
-                "mf2/mf2": "To parse microformats2 structures from (X)HTML"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/BarnabyWalters/Mf2/Functions.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Barnaby Walters",
-                    "email": "barnaby@waterpigs.co.uk"
-                }
-            ],
-            "description": "Cleans up microformats2 array structures",
-            "time": "2014-10-06 23:11:15"
-        },
         {
             "name": "cebe/markdown",
             "version": "1.1.1",
@@ -105,27 +64,30 @@
                 "markdown",
                 "markdown-extra"
             ],
-            "time": "2016-09-14 20:40:20"
+            "time": "2016-09-14T20:40:20+00:00"
         },
         {
             "name": "indieauth/client",
-            "version": "0.2.1",
+            "version": "1.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/indieauth-client-php.git",
-                "reference": "f5f6efad79334d1ff9370fe4dce8ccf4814820fa"
+                "reference": "2ebd8396913ae8c72438dc24f037c8e1717b66ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/f5f6efad79334d1ff9370fe4dce8ccf4814820fa",
-                "reference": "f5f6efad79334d1ff9370fe4dce8ccf4814820fa",
+                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/2ebd8396913ae8c72438dc24f037c8e1717b66ed",
+                "reference": "2ebd8396913ae8c72438dc24f037c8e1717b66ed",
                 "shasum": ""
             },
             "require": {
-                "barnabywalters/mf-cleaner": "0.*",
-                "indieweb/link-rel-parser": "0.1.*",
-                "mf2/mf2": "~0.3",
-                "php": ">5.3.0"
+                "indieweb/representative-h-card": "^0.1.2",
+                "mf2/mf2": ">=0.3.2",
+                "p3k/http": ">=0.1.6",
+                "php": ">5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.8.*"
             },
             "type": "library",
             "autoload": {
@@ -135,16 +97,26 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "Apache 2.0"
+                "Apache-2.0"
             ],
             "authors": [
                 {
                     "name": "Aaron Parecki",
-                    "homepage": "http://aaronparecki.com"
+                    "homepage": "https://aaronparecki.com"
                 }
             ],
             "description": "IndieAuth Client Library",
-            "time": "2017-04-26 21:44:35"
+            "support": {
+                "issues": "https://github.com/indieweb/indieauth-client-php/issues",
+                "source": "https://github.com/indieweb/indieauth-client-php/tree/1.1.5"
+            },
+            "funding": [
+                {
+                    "url": "https://opencollective.com/indieweb",
+                    "type": "opencollective"
+                }
+            ],
+            "time": "2021-01-10T00:19:07+00:00"
         },
         {
             "name": "indieweb/link-rel-parser",
@@ -190,7 +162,7 @@
                 "indieweb",
                 "microformats2"
             ],
-            "time": "2017-01-11 17:14:49"
+            "time": "2017-01-11T17:14:49+00:00"
         },
         {
             "name": "indieweb/mention-client",
@@ -232,7 +204,56 @@
             ],
             "description": "Client library for sending webmention and pingback notifications",
             "homepage": "https://github.com/indieweb/mention-client-php",
-            "time": "2018-10-27 19:41:41"
+            "time": "2018-10-27T19:41:41+00:00"
+        },
+        {
+            "name": "indieweb/representative-h-card",
+            "version": "0.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/indieweb/representative-h-card-php.git",
+                "reference": "97731c6ccc0838418c775b867bf826aeaa91cd95"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/indieweb/representative-h-card-php/zipball/97731c6ccc0838418c775b867bf826aeaa91cd95",
+                "reference": "97731c6ccc0838418c775b867bf826aeaa91cd95",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "mf2/mf2": "0.2.*",
+                "phpunit/phpunit": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/mf2/representative-h-card.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Parecki",
+                    "homepage": "http://aaronparecki.com"
+                }
+            ],
+            "keywords": [
+                "h-card",
+                "indieweb",
+                "mf2",
+                "microformats"
+            ],
+            "support": {
+                "issues": "https://github.com/indieweb/representative-h-card-php/issues",
+                "source": "https://github.com/indieweb/representative-h-card-php/tree/0.1.3"
+            },
+            "time": "2023-05-24T15:33:06+00:00"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -274,7 +295,7 @@
                 "hashing",
                 "password"
             ],
-            "time": "2014-11-20 16:49:30"
+            "time": "2014-11-20T16:49:30+00:00"
         },
         {
             "name": "j4mie/idiorm",
@@ -335,7 +356,7 @@
                 "orm",
                 "query builder"
             ],
-            "time": "2017-03-21 01:31:25"
+            "time": "2017-03-21T01:31:25+00:00"
         },
         {
             "name": "league/container",
@@ -393,7 +414,7 @@
                 "injection",
                 "league"
             ],
-            "time": "2015-04-05 17:14:48"
+            "time": "2015-04-05T17:14:48+00:00"
         },
         {
             "name": "league/plates",
@@ -448,7 +469,7 @@
                 "templating",
                 "views"
             ],
-            "time": "2016-12-28 00:14:17"
+            "time": "2016-12-28T00:14:17+00:00"
         },
         {
             "name": "league/route",
@@ -506,7 +527,7 @@
                 "league",
                 "route"
             ],
-            "time": "2015-09-11 07:40:31"
+            "time": "2015-09-11T07:40:31+00:00"
         },
         {
             "name": "mf2/mf2",
@@ -562,7 +583,7 @@
                 "parser",
                 "semantic"
             ],
-            "time": "2018-08-24 14:47:04"
+            "time": "2018-08-24T14:47:04+00:00"
         },
         {
             "name": "nikic/fast-route",
@@ -605,7 +626,7 @@
                 "router",
                 "routing"
             ],
-            "time": "2016-03-25 23:46:52"
+            "time": "2016-03-25T23:46:52+00:00"
         },
         {
             "name": "p3k/caterpillar",
@@ -642,7 +663,7 @@
                 }
             ],
             "description": "Caterpillar is a background queue manager",
-            "time": "2017-03-19 19:58:18"
+            "time": "2017-03-19T19:58:18+00:00"
         },
         {
             "name": "p3k/http",
@@ -680,7 +701,7 @@
             ],
             "description": "A simple wrapper API around the PHP curl functions",
             "homepage": "https://github.com/aaronpk/p3k-http",
-            "time": "2019-06-15 20:49:26"
+            "time": "2019-06-15T20:49:26+00:00"
         },
         {
             "name": "p3k/multipart",
@@ -716,7 +737,7 @@
                 }
             ],
             "description": "Multipart Encoding Library",
-            "time": "2015-07-16 19:28:02"
+            "time": "2015-07-16T19:28:02+00:00"
         },
         {
             "name": "pda/pheanstalk",
@@ -766,7 +787,7 @@
             "keywords": [
                 "beanstalkd"
             ],
-            "time": "2016-09-22 04:57:03"
+            "time": "2016-09-22T04:57:03+00:00"
         },
         {
             "name": "predis/predis",
@@ -816,7 +837,7 @@
                 "predis",
                 "redis"
             ],
-            "time": "2016-06-16 16:22:20"
+            "time": "2016-06-16T16:22:20+00:00"
         },
         {
             "name": "symfony/http-foundation",
@@ -871,7 +892,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2017-05-01 14:31:55"
+            "time": "2017-05-01T14:31:55+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -930,7 +951,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14 01:06:16"
+            "time": "2016-11-14T01:06:16+00:00"
         },
         {
             "name": "symfony/polyfill-php54",
@@ -988,7 +1009,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14 01:06:16"
+            "time": "2016-11-14T01:06:16+00:00"
         },
         {
             "name": "symfony/polyfill-php55",
@@ -1044,7 +1065,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14 01:06:16"
+            "time": "2016-11-14T01:06:16+00:00"
         }
     ],
     "packages-dev": [],
@@ -1055,6 +1076,7 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": []
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }

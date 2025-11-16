@@ -3,7 +3,7 @@
     "j4mie/idiorm": "1.5.*",
     "predis/predis": "1.*",
     "mf2/mf2": "^0.4.6",
-    "indieauth/client": ">=0.2.0",
+    "indieauth/client": "^1.1",
     "indieweb/mention-client": ">=1.2",
     "pda/pheanstalk": "dev-master",
     "cebe/markdown": "^1.1",

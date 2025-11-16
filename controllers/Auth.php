@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class Auth extends Controller {
 
   private static function buildClientID() {
-    return Config::$baseURL . '/';
+    return Config::$baseURL . '/client.json';
   }
 
   private static function buildRedirectURI() {
@@ -33,120 +33,60 @@ class Auth extends Controller {
     $response->setStatusCode(302);
     return $response;
   }
+  
+  public function client_metadata(Request $request, Response $response) {
+    $response->headers->set('Content-type', 'application/json');
+    $response->setContent(json_encode([
+      'client_id' => self::buildClientID(),
+      'client_name' => 'OwnYourSwarm',
+      'client_uri' => Config::$baseURL,
+      'redirect_uris' => [self::buildRedirectURI()],
+    ], JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES));
+    return $response;
+  }
 
   public function start(Request $request, Response $response) {
-    if(!$request->get('me') || !($me = IndieAuth\Client::normalizeMeURL($request->get('me')))) {
+    IndieAuth\Client::$clientID = self::buildClientID();
+    IndieAuth\Client::$redirectURL = self::buildRedirectURI();
+    
+    list($authorizationURL, $error) = IndieAuth\Client::begin($_POST['url'], 'create update');
+
+    if($error) {
       $response->setContent(view('auth/error', [
         'title' => 'OwnYourSwarm',
-        'error' => 'Invalid "me" Parameter',
-        'description' => 'The URL you entered, "' . $request->get('me') . '" is not valid.'
+        'error' => $error['error'],
+        'description' => $error['error_description']
       ]));
-      return $response;
+      return $response;      
     }
 
-    $authorizationEndpoint = IndieAuth\Client::discoverAuthorizationEndpoint($me);
-    $tokenEndpoint = IndieAuth\Client::discoverTokenEndpoint($me);
-    $micropubEndpoint = IndieAuth\Client::discoverMicropubEndpoint($me);
-
-    if($tokenEndpoint && $micropubEndpoint && $authorizationEndpoint) {
-      // Generate a "state" parameter for the request
-      $state = IndieAuth\Client::generateStateParameter();
-      $_SESSION['auth_state'] = $state;
-      $_SESSION['auth_me'] = $me;
-
-      $scope = 'create update';
-      $authorizationURL = IndieAuth\Client::buildAuthorizationURL($authorizationEndpoint, $me, self::buildRedirectURI(), self::buildClientID(), $state, $scope);
-    } else {
-      $authorizationURL = false;
-    }
-
-    // If the user has already signed in before and has a micropub access token, skip
-    // the debugging screens and redirect immediately to the auth endpoint.
-    // This will still generate a new access token when they finish logging in.
-    $user = ORM::for_table('users')->where('url', $me)->find_one();
-    if($user && $user->micropub_access_token && !$request->get('restart')) {
-      $user->micropub_endpoint = $micropubEndpoint;
-      $user->authorization_endpoint = $authorizationEndpoint;
-      $user->token_endpoint = $tokenEndpoint;
-      $user->save();
-
-      $response->headers->set('Location', $authorizationURL);
-      $response->setStatusCode(302);
-      return $response;
-    } else {
-      if(!$user)
-        $user = ORM::for_table('users')->create();
-      $user->url = $me;
-      $user->date_created = date('Y-m-d H:i:s');
-      $user->micropub_endpoint = $micropubEndpoint ?: '';
-      $user->authorization_endpoint = $authorizationEndpoint ?: '';
-      $user->token_endpoint = $tokenEndpoint ?: '';
-      $user->save();
-
-      $response->setContent(view('auth/start', [
-        'title' => 'Sign In - OwnYourSwarm',
-        'me' => $me,
-        'meParts' => parse_url($me),
-        'authorizing' => $me,
-        'tokenEndpoint' => $tokenEndpoint,
-        'micropubEndpoint' => $micropubEndpoint,
-        'authorizationEndpoint' => $authorizationEndpoint,
-        'authorizationURL' => $authorizationURL
-      ]));
-      return $response;
-    }
+    $response->headers->set('Location', $authorizationURL);
+    $response->setStatusCode(302);
+    return $response;
   }
 
   public function callback(Request $request, Response $response) {
-    // Restart the login if no state is in the session
-    if(!array_key_exists('auth_state', $_SESSION) || !array_key_exists('auth_me', $_SESSION)) {
-      $response->headers->set('Location', '/auth/start?me='.urlencode($_SESSION['auth_me']));
-      $response->setStatusCode(302);
-      return $response;
-    }
+    IndieAuth\Client::$clientID = self::buildClientID();
+    IndieAuth\Client::$redirectURL = self::buildRedirectURI();
 
-    $me = $_SESSION['auth_me'];
-
-    if(!$request->get('code')) {
+    list($r, $error) = IndieAuth\Client::complete($_GET);
+    
+    if($error) {
       $response->setContent(view('auth/error', [
         'title' => 'OwnYourSwarm',
-        'error' => 'Missing authorization code',
-        'description' => 'No authorization code was returned from the authorization endpoint.'
+        'error' => $error['error'],
+        'description' => $error['error_description']
       ]));
-      return $response;
+      return $response;      
     }
 
-    if(!$request->get('state')) {
-      $response->setContent(view('auth/error', [
-        'title' => 'OwnYourSwarm',
-        'error' => 'Missing state',
-        'description' => 'No state was returned from the authorization endpoint.'
-      ]));
-      return $response;
-    }
-
-    if($request->get('state') != $_SESSION['auth_state']) {
-      $response->setContent(view('auth/error', [
-        'title' => 'OwnYourSwarm',
-        'error' => 'Invalid state',
-        'description' => 'The state parameter returned from the authorization endpoint did not match. This is most likely caused by a malicious authorization attempt, or by attempting to sign in in two different browser tabs simultaneously.'
-      ]));
-      return $response;
-    }
+    $me = $r['me'];
 
     $micropubEndpoint = IndieAuth\Client::discoverMicropubEndpoint($me);
-    $tokenEndpoint = IndieAuth\Client::discoverTokenEndpoint($me);
 
-    if($tokenEndpoint) {
-      $token = IndieAuth\Client::getAccessToken($tokenEndpoint, $request->get('code'), $me, self::buildRedirectURI(), self::buildClientID(), $request->get('state'), true);
-
-    } else {
-      $token = array('auth'=>false, 'response'=>false);
-    }
-
-    if($token['auth'] && k($token['auth'], array('me','access_token','scope'))) {
-      $_SESSION['auth'] = $token['auth'];
-      $_SESSION['me'] = $token['auth']['me'];
+    if($r['response'] && k($r['response'], array('me','access_token','scope'))) {
+      $_SESSION['auth'] = $r['response'];
+      $_SESSION['me'] = $me;
 
       $user = ORM::for_table('users')->where('url', $me)->find_one();
       if($user) {
@@ -170,15 +110,12 @@ class Auth extends Controller {
 
       }
       $user->micropub_endpoint = $micropubEndpoint;
-      $user->micropub_access_token = $token['auth']['access_token'];
-      $user->micropub_response = $token['response'];
+      $user->micropub_access_token = $r['response']['access_token'];
+      $user->micropub_response = $r['response'];
 
       $user->save();
       $_SESSION['user_id'] = $user->id();
     }
-
-    unset($_SESSION['auth_state']);
-    unset($_SESSION['auth_me']);
 
     // If they have not yet connected a Swarm account, show that prompt now
     if($user->foursquare_user_id || $user->micropub_success) {

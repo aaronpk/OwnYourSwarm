@@ -9,11 +9,11 @@
       </div>
     </h2>
 
-    <form class="ui large form" action="/auth/start" method="get">
+    <form class="ui large form" action="/auth/start" method="post">
       <div class="field">
         <div class="ui left icon input">
           <i class="globe icon"></i>
-          <input type="url" name="me" placeholder="https://you.example.com">
+          <input type="url" name="url" placeholder="https://you.example.com">
         </div>
       </div>
 
@@ -21,3 +21,25 @@
     </form>
   </div>
 </div>
+<script>
+// add https:// to URL fields
+// https://aaronparecki.com/2018/06/03/3/
+document.addEventListener('DOMContentLoaded', function() {
+  function addDefaultScheme(target) {
+    if(target.value.match(/^(?!https?:).+\..+/)) {
+      target.value = "https://"+target.value;
+    }
+  }
+  var elements = document.querySelectorAll("input[type=url]");
+  Array.prototype.forEach.call(elements, function(el, i){
+    el.addEventListener("blur", function(e){
+      addDefaultScheme(e.target);
+    });
+    el.addEventListener("keydown", function(e){
+      if(e.keyCode == 13) {
+        addDefaultScheme(e.target);
+      }
+    });
+  });
+});
+</script>
